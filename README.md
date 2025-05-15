@@ -1,8 +1,27 @@
-# Prototyping Card Game
+# Prototype Card Game
 
-A React-based card game prototyping tool.  
-This project lets you define card game layouts, zones, and cards using a flexible configuration system.
+Prototype Card Game is a web application built with React that allows you to customize game setup and import cards. It provides a drag-and-drop interface for managing different zones of cards, such as deck, hand, play area, and discard pile.
 
+You may customize the Droppable Zones between 
+- Stacks 
+    - Single Card Face up or Down
+- Bar
+    - Row of Cards that can default to portrait or landscape
+    - Sortable, move cards to different slots
+- Play
+    - Area to drag and drop anywhere
+
+Card Actions
+- Click and Hold to drag cards
+- Left Click to turn counter clockwise
+- Right Click to turn clockwise
+- Toolbar: Show hide and quick set rotation
+
+Import
+- Game Setup
+- Card Data
+
+View @ [boydbuchanan.github.io/prototype-card-game](https://boydbuchanan.github.io/prototype-card-game/)
 ---
 
 ## Table of Contents

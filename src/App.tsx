@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import 'App.css';
 import "styles/theme.css";
 import PlayingCardsLogo from 'CardsLogo';
-import Home, { defaultSetup, GameSetup } from 'pages/Home';
+import Home, { defaultSetup } from 'pages/Home';
 import InfoPage from 'pages/Info';
-import { CardData } from 'components/Card';
+
 import Papa from 'papaparse';
+import { CardData, GameSetup } from 'types';
 
 function App() {
   const [game, setGameState] = useState<GameSetup>(defaultSetup);

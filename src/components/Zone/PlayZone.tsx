@@ -1,8 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useDrop } from "react-dnd";
-import Card, { CardFace, CardData } from "components/Card";
-import Zone from "./Zone";
+import Card from "components/Card";
+import Zone from "components/Zone";
 import "./Zone.css"; // Import the Zone CSS file
+import { CardData } from "types";
+import { CardFace } from "enums";
 
 interface PlayZoneProps {
   zoneName: string;

@@ -12,3 +12,12 @@ export enum Position {
   Right = "right",
   Bottom = "bottom",
 }
+export enum CardZoneType {
+  Stack,
+  Bar,
+}
+export enum CardFace {
+  FaceUp = "faceUp",
+  FaceDown = "faceDown",
+  Both = "both",
+}

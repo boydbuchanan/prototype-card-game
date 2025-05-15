@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
-import Card, { CardFace } from "components/Card";
-import Zone from "components/Zone/Zone";
-import "components/Zone/Zone.css"; // Import the Zone CSS file
+import Card from "components/Card";
+import Zone from "components/Zone";
+import "./Zone.css"; // Import the Zone CSS file
 
-import { CardData } from "components/Card";
-import { Position, Rotation } from "enums";
+import { CardFace, CardZoneType, Position, Rotation } from "enums";
+import { CardData } from "types";
 
 interface CardZoneProps {
   zoneName: string;
@@ -17,10 +17,6 @@ interface CardZoneProps {
   onCardDrop?: (cardId: string, hoverIndex: number, zoneName: string) => void
   cardDisplayType?: CardFace;
   cardRotation?: Rotation; // Optional rotation prop for the card
-}
-export enum CardZoneType {
-  Stack,
-  Bar,
 }
 
 const CardZone: React.FC<CardZoneProps> = ({

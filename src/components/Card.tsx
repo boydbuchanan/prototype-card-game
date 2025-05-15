@@ -1,18 +1,10 @@
 import React, { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import "./Card.css"; // Import the Card CSS file
-import { Rotation } from "enums";
+import { CardFace, Rotation } from "enums";
+import { CardData } from "types";
 
-// Define the CardData type
-export interface CardData {
-  id: string;
-  cardName: string;
-  cardType: string;
-  cardText: string;
-  cardColor: string;
-  startZone: string;
-  playerId: string;
-}
+
 
 interface DragItem {
   id: string;
@@ -28,12 +20,6 @@ interface CardProps {
   rotate?: Rotation; // Optional prop for rotation
   zoneName: string; // Optional prop for the zone name
   onCardDrop?: (cardId: string, hoverIndex: number, zoneName: string) => void
-}
-
-export enum CardFace {
-  FaceUp = "faceUp",
-  FaceDown = "faceDown",
-  Both = "both",
 }
 
 const Card: React.FC<CardProps> = ({

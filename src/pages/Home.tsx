@@ -3,31 +3,14 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import CardZone, { CardZoneType } from "components/Zone/CardZone";
-import { PlayZone } from "components/Zone/PlayZone";
+import { PlayZone, CardZone } from "components/Zone";
 
-import { CardData, CardFace } from "components/Card";
-import { Position, Rotation } from "enums";
+
+import { CardFace, CardZoneType, Position, Rotation } from "enums";
 
 import "styles/Play.css"; // Import the Zone CSS file
+import { CardData, GameSetup } from "types";
 
-export interface GameSetup {
-  Players: number;
-  Cards: CardData[],
-  SharedZones: RowSetup[],
-  PlayerZones: RowSetup[],
-}
-export interface RowSetup {
-  RowName: string,
-  Zones: ZoneSetup[]
-}
-export interface ZoneSetup {
-  Name: string;
-  CardDisplay: CardFace;
-  ZoneType: CardZoneType;
-  CardRotation?: Rotation;
-  TextPosition?: Position;
-}
 export const defaultSetup: GameSetup = {
   Players: 1,
   Cards: [],
@@ -88,6 +71,7 @@ export const defaultSetup: GameSetup = {
     ]
   }],
 };
+
 
 
 export function Page({ cardData, gameSetup }: { cardData?: CardData[] | null, gameSetup?: GameSetup }) {
