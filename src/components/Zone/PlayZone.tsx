@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useDrag, useDrop } from "react-dnd";
+import { useDrop } from "react-dnd";
 import Card, { CardFace, CardData } from "components/Card";
 import Zone from "./Zone";
 import "./Zone.css"; // Import the Zone CSS file
@@ -37,7 +37,7 @@ export const PlayZone: React.FC<PlayZoneProps> = ({
     }));
   };
 
-  const [{ canDrop, isOver, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: "card",
     drop: (item: { id: string }, monitor) => {
       if (monitor.isOver({ shallow: true })) {

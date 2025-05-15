@@ -9,7 +9,7 @@ interface ZoneProps {
 }
 
 const Zone: React.FC<ZoneProps> = ({ zoneName, onZoneDrop, children }) => {
-  const [{ isOver, isOverCurrent }, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop(() => ({
     accept: "card",
     drop: (item: { id: string }, monitor) => {
     // hover: (item: { id: string }, monitor) => {

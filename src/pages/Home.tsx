@@ -160,7 +160,7 @@ export function Page({ cardData, gameSetup }: { cardData?: CardData[] | null, ga
     console.log("Card ID:", cardId, "New Zone:", newZone);
     setCards((prevCards) => {
       // Find the card in the previous cards state
-      const { card: movedCard, zone: oldZone } = findCard(prevCards, cardId);
+      const { card: movedCard } = findCard(prevCards, cardId);
 
       if (!movedCard) {
         return prevCards; // Card not found, return the previous state

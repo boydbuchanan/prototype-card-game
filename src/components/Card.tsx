@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import "./Card.css"; // Import the Card CSS file
 import { Rotation } from "enums";
 
@@ -56,7 +56,7 @@ const Card: React.FC<CardProps> = ({
   else if (rotate === Rotation.Normal) initialRotate = 0;
   
   const [rotation, setRotation] = useState<number>(initialRotate); // State for rotation
-  const [hasDropped, setHasDropped] = useState(false);
+  
   const [, drop] = useDrop<DragItem>({
     accept: "card",
     // drop: (item, monitor) => {
@@ -71,14 +71,13 @@ const Card: React.FC<CardProps> = ({
       // Time to actually perform the action
       onCardDrop?.(item.id, hoverIndex, zoneName);
       item.index = hoverIndex; // Note: mutating the monitor item here is acceptable because we are only changing the index
-      setHasDropped(true); // Set hasDropped to true when a card is dropped
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       isOverCurrent: monitor.isOver({ shallow: true }),
       canDrop: monitor.canDrop(),
     }),
-  }, [index, onCardDrop, zoneName, setHasDropped]);
+  }, [index, onCardDrop, zoneName]);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "card",
     item: { id: card.id },
