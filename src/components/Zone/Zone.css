@@ -1,0 +1,115 @@
+.zone {
+  min-height: 176px;
+
+  /* Add other styling properties */
+}
+
+.center-text {
+  text-align: center;
+}
+
+.bar-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between cards as needed */
+  min-height: 220px; /* Set a minimum height for the drop zone */
+  min-width: 830px;
+  max-width: 830px;
+  border: 2px dashed var(--border); /* Add a dashed border for the drop zone */
+  overflow: auto;
+}
+.single-card-zone {
+  width: 170px;
+  height: 220px;
+  border: 2px dashed var(--border);
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+.play-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between cards as needed */
+  min-height: 550px; /* Set a minimum height for the drop zone */
+  min-width: 1200px; /* Set a minimum height for the drop zone */
+  border: 2px dashed var(--border); /* Add a dashed border for the drop zone */
+}
+
+.zones-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between cards as needed */
+}
+
+.zones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container {
+  margin-top: 5px;
+}
+
+.card-list {
+  height: 100%;
+}
+
+/* Container for the text and the zone */
+.zone-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative; /* Allow absolute positioning of text */
+}
+.zone-container.highlight {
+  background-color: var(--highlight); /* Highlight background color */
+  border-radius: 4px; /* Rounded corners for the highlight */
+}
+
+/* Text positioning */
+.zone-container.text-top {
+  flex-direction: column; /* Stack text above the zone */
+}
+
+.zone-container.text-bottom {
+  flex-direction: column-reverse; /* Stack text below the zone */
+}
+
+.zone-container.text-left {
+  flex-direction: row; /* Text to the left of the zone */
+}
+
+.zone-container.text-right {
+  flex-direction: row-reverse; /* Text to the right of the zone */
+}
+
+/* Text rotation */
+.zone-text {
+  font-size: 16px;
+  width: 100px; /* Set a fixed width for the text */
+  color: var(--foreground);;
+  text-align: center;
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.zone-text.rotate-normal {
+  transform: rotate(0deg);
+}
+
+.zone-text.rotate-left {
+  transform: rotate(-90deg);
+}
+
+.zone-text.rotate-right {
+  transform: rotate(90deg);
+}
+
+.zone-text.rotate-reverse {
+  transform: rotate(180deg);
+}

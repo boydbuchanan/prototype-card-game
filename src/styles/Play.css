@@ -1,0 +1,56 @@
+.play-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+.player-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Adjust the gap between cards as needed */
+  width: 100%;
+  overflow: auto;
+}
+
+.player-zone {
+  /* border: 1px dashed #f3f3f3; */
+}
+
+.area-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between cards as needed */
+}
+
+.shared-zones {
+
+}
+
+.shared-zone-row {
+
+}
+.no-scroll {
+  overflow: hidden; /* Disable scrolling */
+}
+.scroll-style {
+  scrollbar-gutter: stable; /* Reserve space for the scrollbar */
+  
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #f5f5f5;
+}
+
+.scroll-style::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-style::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.scroll-style::-webkit-scrollbar-thumb {
+  background: #888888;
+  border-radius: 4px;
+}

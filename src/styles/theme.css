@@ -1,0 +1,50 @@
+
+:root {
+  --background: #dbdfe6;
+  --foreground: #3b3b3b;
+  --border: #3b3b3b;
+  --highlight: rgba(255, 255, 0, 0.1);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #3b3b3b;
+    --foreground: #dbdfe6;
+    --border: #dbdfe6;
+    --highlight: rgba(255, 255, 0, 0.1);
+  }
+}
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+}
+
+
+.info-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 24px;
+  background: var(--background);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+}
+
+.info-container h1 {
+  color: var(--foreground, #3b3b3b);
+}
+
+.info-pre {
+  border: 1px dashed var(--border);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  overflow-x: auto;
+}

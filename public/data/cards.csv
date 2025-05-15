@@ -1,0 +1,17 @@
+id,cardName,cardType,cardText,startZone,playerId,cardColor
+1,1,Item,+1 NRG,Deck,0,#C5283D
+2,2,Item,+1 NRG,Deck,0,#C5283D
+3,3,Item,+1 NRG,Deck,0,#C5283D
+4,4,Item,+1 NRG,Deck,0,#C5283D
+5,5,Weapon,BLK,Deck,0,#002A32
+6,6,Weapon,ATK,Deck,0,#002A32
+7,7,Skill,SKL,Deck,0,#7C3626
+8,8,Skill,SKL,Deck,0,#7C3626
+9,9,Ability,+2 MNA,Deck,0,#E9724C
+10,10,Ability,+2 MNA,Deck,0,#E9724C
+11,11,Ability,+2 MNA,Deck,0,#E9724C
+12,12,Ability,+2 MNA,Deck,0,#E9724C
+13,13,Base,+1 Luck,Hand,1,#333333
+14,14,Base,+1 Luck,Hand,1,#333333
+15,15,Base,+1 Luck,Hand,1,#333333
+16,16,Base,+1 Luck,Hand,1,#333333
