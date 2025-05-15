@@ -1,0 +1,65 @@
+{
+  "Players": 1,
+  "Cards": [],
+  "SharedZones": [
+    {
+      "RowName": "Shared",
+      "Zones": [
+        {
+          "Name": "Deck",
+          "CardDisplay": "faceDown",
+          "ZoneType": 0,
+          "TextPosition": "top"
+        },
+        {
+          "Name": "Discard",
+          "CardDisplay": "faceUp",
+          "ZoneType": 0,
+          "TextPosition": "bottom"
+        }
+      ]
+    }
+  ],
+  "PlayerZones": [
+    {
+      "RowName": "In Play",
+      "Zones": [
+        {
+          "Name": "In Play",
+          "CardDisplay": "both",
+          "ZoneType": 1,
+          "TextPosition": "left"
+        }
+      ]
+    },
+    {
+      "RowName": "Resource",
+      "Zones": [
+        {
+          "Name": "Resource",
+          "CardDisplay": "faceUp",
+          "ZoneType": 1,
+          "CardRotation": "left",
+          "TextPosition": "left"
+        }
+      ]
+    },
+    {
+      "RowName": "Player",
+      "Zones": [
+        {
+          "Name": "Hand",
+          "CardDisplay": "both",
+          "ZoneType": 1,
+          "TextPosition": "left"
+        },
+        {
+          "Name": "Removed",
+          "CardDisplay": "faceUp",
+          "ZoneType": 0,
+          "TextPosition": "right"
+        }
+      ]
+    }
+  ]
+}
