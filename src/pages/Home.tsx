@@ -6,26 +6,10 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import CardZone, { CardZoneType } from "components/Zone/CardZone";
 import { PlayZone } from "components/Zone/PlayZone";
 
-import { parse } from "papaparse";
-
 import { CardData, CardFace } from "components/Card";
 import { Position, Rotation } from "enums";
 
 import "styles/Play.css"; // Import the Zone CSS file
-
-const loadCsvFromPublicFolder = async (filePath: string) => {
-  try {
-    const response = await fetch(filePath);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
-    }
-    const csvText = await response.text();
-    return csvText;
-  } catch (error) {
-    console.error("Error loading CSV file:", error);
-    return null;
-  }
-};
 
 export interface GameSetup {
   Players: number;
@@ -44,7 +28,7 @@ export interface ZoneSetup {
   CardRotation?: Rotation;
   TextPosition?: Position;
 }
-export const gameSetup: GameSetup = {
+export const defaultSetup: GameSetup = {
   Players: 1,
   Cards: [],
   SharedZones: [{
@@ -106,37 +90,16 @@ export const gameSetup: GameSetup = {
 };
 
 
-export function Page() {
-  const [game, setGameState] = useState<GameSetup>(gameSetup);
-  
+export function Page({ cardData, gameSetup }: { cardData?: CardData[] | null, gameSetup?: GameSetup }) {
+  const game = useMemo(() => gameSetup || defaultSetup, [gameSetup]);
   const [cards, setCards] = useState<Record<string, CardData[]>>({});
 
+  // Initialize cards state when cardData or game changes
   useEffect(() => {
-    const csvPath = `/data/cards.csv`; // Path to the CSV file in the public folder
-    loadCsvFromPublicFolder(csvPath).then((csvText) => {
-      if (csvText) {
-        parse(csvText, {
-          header: true,
-          complete: (results) => {
-            const parsedData = results.data;
-            initData(parsedData);
-          },
-          error: (error: any) => {
-            console.error("Error parsing CSV:", error);
-          },
-        });
-      }
-    });
-  }, []);
-
-  const initData = (cardData: any[]) => {
     if (!Array.isArray(cardData) || cardData.length === 0) {
-      console.error("No card data found or invalid format.");
+      setCards({});
       return;
     }
-
-    // Debug: Log the parsed card data
-    console.log("Parsed card data:", cardData);
 
     const updatedCards: Record<string, CardData[]> = {
       "Deck": cardData.filter((card) => card.startZone === "Deck" && card.playerId === "0"),
@@ -147,7 +110,9 @@ export function Page() {
     game.SharedZones.forEach((row) => {
       row.Zones.forEach((zone) => {
         if (!updatedCards[zone.Name]) {
-          updatedCards[zone.Name] = cardData.filter((card) => card.startZone === zone.Name && card.playerId === "0"); 
+          updatedCards[zone.Name] = cardData.filter(
+            (card) => card.startZone === zone.Name && card.playerId === "0"
+          );
         }
       });
     });
@@ -158,17 +123,16 @@ export function Page() {
         row.Zones.forEach((zone) => {
           const zoneId = `${zone.Name}-${i}`;
           if (!updatedCards[zoneId]) {
-            updatedCards[zoneId] = cardData.filter((card) => card.startZone === zone.Name && card.playerId === `${i}`); // Filter cards for the specific player
+            updatedCards[zoneId] = cardData.filter(
+              (card) => card.startZone === zone.Name && card.playerId === `${i}`
+            );
           }
         });
       });
     }
 
-    // Debug: Log the initialized cards state
-    console.log("Initialized cards state:", updatedCards);
-
     setCards(updatedCards);
-  };
+  }, [cardData, game]);
 
   const findCard = (
     cards: Record<string, CardData[]>,
