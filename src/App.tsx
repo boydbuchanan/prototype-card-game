@@ -16,6 +16,9 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const gameSetupInputRef = useRef<HTMLInputElement>(null);
 
+  // Dynamically set basename for GitHub Pages, empty for local dev
+  const basename = process.env.PUBLIC_URL?.replace(/https?:\/\/[^/]+/, "") || "";
+
   // Load cards.csv by default on mount
   useEffect(() => {
     const csvUrl = `${process.env.PUBLIC_URL}/data/cards.csv`;
@@ -105,7 +108,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router basename={basename}>
       <header
         style={{
           display: "flex",
