@@ -4,45 +4,29 @@
   /* Add other styling properties */
 }
 
-.center-text {
-  text-align: center;
-}
-
-.bar-zone {
+.player-zone-row, .shared-zone-row {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 10px; /* Adjust the gap between cards as needed */
-  min-height: 220px; /* Set a minimum height for the drop zone */
-  min-width: 830px;
-  max-width: 830px;
-  border: 2px dashed var(--border); /* Add a dashed border for the drop zone */
-  overflow: auto;
+  gap: var(--gap-standard);
 }
-.single-card-zone {
-  width: 170px;
-  height: 220px;
-  border: 2px dashed var(--border);
-  display: flex; /* Use flexbox for centering */
-  justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
-}
-
 .play-zone {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px; /* Adjust the gap between cards as needed */
-  min-height: 550px; /* Set a minimum height for the drop zone */
-  min-width: 1200px; /* Set a minimum height for the drop zone */
-  border: 2px dashed var(--border); /* Add a dashed border for the drop zone */
+  gap: var(--gap-standard);
 }
-
-.zones-row {
+.bar-zone {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px; /* Adjust the gap between cards as needed */
+  justify-content: center;
+  align-items: flex-end;
+  overflow: auto;
+  gap: var(--gap-standard);
+}
+.single-card-zone {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .zones {
@@ -55,7 +39,7 @@
   margin-top: 5px;
 }
 
-.card-list {
+.zone-card-list {
   height: 100%;
 }
 

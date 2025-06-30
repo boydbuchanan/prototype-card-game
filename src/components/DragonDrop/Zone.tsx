@@ -11,8 +11,7 @@ interface ZoneProps {
 const Zone: React.FC<ZoneProps> = ({ zoneName, onZoneDrop, children }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "card",
-    drop: (item: { id: string }, monitor) => {
-    // hover: (item: { id: string }, monitor) => {
+    drop: (item: { id: string; index?: number }, monitor) => {
       // Only handle the drop if directly over this drop target
       if (monitor.isOver({ shallow: true })) {
         onZoneDrop(item.id, zoneName);
@@ -29,7 +28,7 @@ const Zone: React.FC<ZoneProps> = ({ zoneName, onZoneDrop, children }) => {
 
   return (
     <div ref={dropRef} className={`zone-container ${isOver ? "highlight" : ""}`}>
-      <div className="card-list">{children}</div>
+      <div className="zone-card-list">{children}</div>
     </div>
   );
 };

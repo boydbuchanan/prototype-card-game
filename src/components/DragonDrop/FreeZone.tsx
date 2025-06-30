@@ -1,14 +1,15 @@
 import React, { useState, useRef } from "react";
 import { useDrop } from "react-dnd";
-import Card from "components/Card";
-import Zone from "components/Zone";
+import Card from "./Card";
+import Zone from "./Zone";
 import "./Zone.css"; // Import the Zone CSS file
 import { CardData } from "types";
-import { CardFace } from "enums";
+import { CardFace, CardType } from "enums";
 
-interface PlayZoneProps {
+interface FreeZoneProps {
   zoneName: string;
   cards: CardData[];
+  cardTypeComponentMap: Record<CardType, React.ComponentType<any>>,
   onZoneDrop: (cardId: string, zoneName: string) => void;
   onCardDrop?: (cardId: string, hoverIndex: number, zoneName: string) => void
   cardDisplayType?: CardFace
@@ -19,12 +20,13 @@ interface CardPosition {
   y: number;
 }
 
-export const PlayZone: React.FC<PlayZoneProps> = ({ 
+export const FreeZone: React.FC<FreeZoneProps> = ({ 
   zoneName, 
   cards, 
   onZoneDrop,
   onCardDrop,
-  cardDisplayType = CardFace.Both, // Default to face up
+  cardDisplayType = CardFace.Both,
+  cardTypeComponentMap,
 }) => {
   const [cardPositions, setCardPositions] = useState<Record<string, CardPosition>>({});
 
@@ -94,7 +96,8 @@ export const PlayZone: React.FC<PlayZoneProps> = ({
                 card={card}
                 onCardDrop={onCardDrop}
                 zoneName={zoneName}
-                cardDisplayType={cardDisplayType} // Assuming you want to display the card face up
+                cardDisplayType={cardDisplayType}
+                cardTypeComponentMap={cardTypeComponentMap}
               />
             </div>
           );
@@ -104,4 +107,4 @@ export const PlayZone: React.FC<PlayZoneProps> = ({
   );
 };
 
-export default PlayZone;
+export default FreeZone;

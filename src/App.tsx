@@ -17,7 +17,7 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const gameSetupInputRef = useRef<HTMLInputElement>(null);
 
-  // Dynamically set basename for GitHub Pages, empty for local dev
+  // Dynamically set basename for deployed, empty for local dev
   const basename = process.env.PUBLIC_URL?.replace(/https?:\/\/[^/]+/, "") || "";
 
   // Load cards.csv by default on mount
@@ -29,6 +29,13 @@ function App() {
         Papa.parse(csvText, {
           header: true,
           skipEmptyLines: true,
+          transform: (value, field) => {
+            // Convert boolean-like strings to actual booleans
+            if (value === 'true') return true;
+            if (value === 'false') return false;
+            // Keep everything else as-is
+            return value;
+          },
           complete: (results) => {
             const parsedData = results.data as CardData[];
             setCards(parsedData);
@@ -57,6 +64,13 @@ function App() {
       Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
+        transform: (value, field) => {
+          // Convert boolean-like strings to actual booleans
+          if (value === 'true') return true;
+          if (value === 'false') return false;
+          // Keep everything else as-is
+          return value;
+        },
         complete: (results) => {
           const parsedData = results.data as CardData[];
           setCards(parsedData);
@@ -109,71 +123,76 @@ function App() {
   };
 
   return (
-    <Router basename={basename}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "12px",
-          padding: "10px 0 10px 0",
-          background: "var(--background, #fff)",
-          borderBottom: "1px solid var(--border, #ccc)",
-          boxShadow: "0 2px 8px 0 rgba(0,0,0,0.03)",
-        }}
-      >
-        <PlayingCardsLogo size={48} />
-        <div>
-          <span style={{ fontWeight: 600, fontSize: 18, color: "var(--foreground, #3b3b3b)" }}>
-            Prototyping Card Game
-          </span>
-          <span style={{ display: "block", fontSize: 13, color: "var(--foreground, #888)" }}>
-            by <strong>Boyd Buchanan</strong>
-          </span>
-        </div>
-        <nav style={{ marginLeft: 24, display: "flex", gap: 8 }}>
-          <Link to="/" className="nav-link">
-            Home
-          </Link>
-          <Link to="/info" className="nav-link">
-            Info
-          </Link>
-        </nav>
-        <div style={{ marginLeft: 24, display: "flex", gap: 8 }}>
-          <button className="nav-button" onClick={handleUploadClick}>
-            Upload Cards CSV
-          </button>
-          <input
-            type="file"
-            accept=".csv"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-          <button className="nav-button" onClick={handleGameSetupUploadClick}>
-            Upload GameSetup JSON
-          </button>
-          <input
-            type="file"
-            accept=".json,application/json"
-            ref={gameSetupInputRef}
-            style={{ display: "none" }}
-            onChange={handleGameSetupFileChange}
-          />
-          <button className="nav-button" onClick={handleDownloadCards}>
-            Download Cards CSV
-          </button>
-          <button className="nav-button" onClick={handleDownloadGameSetup}>
-            Download GameSetup JSON
-          </button>
-        </div>
-      </header>
-      
-      <Routes>
-        <Route path="/" element={<Home cardData={cards} gameSetup={game} />} />
-        <Route path="/info" element={<InfoPage />} />
-      </Routes>
-    </Router>
+    <div style={{ height: '100%' }}>
+      <Router basename={basename}>
+        <header
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1001,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+            padding: "10px 0 10px 0",
+            background: "var(--background, #fff)",
+            borderBottom: "1px solid var(--border, #ccc)",
+            boxShadow: "0 2px 8px 0 rgba(0,0,0,0.03)",
+          }}
+        >
+          <PlayingCardsLogo size={48} />
+          <div>
+            <span style={{ fontWeight: 600, fontSize: 18, color: "var(--foreground, #3b3b3b)" }}>
+              Prototyping Card Game
+            </span>
+            <span style={{ display: "block", fontSize: 13, color: "var(--foreground, #888)" }}>
+              by <strong>Boyd Buchanan</strong>
+            </span>
+          </div>
+          <nav style={{ marginLeft: 24, display: "flex", gap: 8 }}>
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+            <Link to="/info" className="nav-link">
+              Info
+            </Link>
+          </nav>
+          <div style={{ marginLeft: 24, display: "flex", gap: 8 }}>
+            <button className="nav-button" onClick={handleUploadClick}>
+              Upload Cards CSV
+            </button>
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <button className="nav-button" onClick={handleGameSetupUploadClick}>
+              Upload GameSetup JSON
+            </button>
+            <input
+              type="file"
+              accept=".json,application/json"
+              ref={gameSetupInputRef}
+              style={{ display: "none" }}
+              onChange={handleGameSetupFileChange}
+            />
+            <button className="nav-button" onClick={handleDownloadCards}>
+              Download Cards CSV
+            </button>
+            <button className="nav-button" onClick={handleDownloadGameSetup}>
+              Download GameSetup JSON
+            </button>
+          </div>
+        </header>
+        
+        <Routes>
+          <Route path="/" element={<Home cardData={cards} gameSetup={game} />} />
+          <Route path="/info" element={<InfoPage />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

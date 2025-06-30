@@ -163,3 +163,9 @@ You can also rotate a card by left- or right-clicking on it. The toolbar is posi
 
 - [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
 - [React documentation](https://reactjs.org/)
+
+## Attribution
+
+This is a modified version of https://github.com/poeticmatter/card-game-prototype
+
+I aimed to move to typescript, and created customizable game setup with more drag and drop zones and added features, such as Zone sorting and card rotations.

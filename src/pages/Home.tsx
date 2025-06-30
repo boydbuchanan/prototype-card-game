@@ -3,17 +3,21 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { PlayZone, CardZone } from "components/Zone";
-
-
+import { FreeZone, CardZone } from "components/DragonDrop";
+import { PlayArea } from "components/PlayArea";
 import { CardFace, CardZoneType, Position, Rotation } from "enums";
 
 import "styles/Play.css"; // Import the Zone CSS file
 import { CardData, GameSetup } from "types";
+import { CardType} from "enums";
 
 export const defaultSetup: GameSetup = {
   Players: 1,
   Cards: [],
+  CardTypeComponentMap: {
+    [CardType.Content]: React.lazy(() => import("components/Game/CardContent")),
+    [CardType.Sandwich]: React.lazy(() => import("components/Game/CardText"))
+  },
   SharedZones: [{
     RowName: "Shared",
     Zones:[
@@ -93,9 +97,10 @@ export function Page({ cardData, gameSetup }: { cardData?: CardData[] | null, ga
     // Initialize shared zones
     game.SharedZones.forEach((row) => {
       row.Zones.forEach((zone) => {
-        if (!updatedCards[zone.Name]) {
-          updatedCards[zone.Name] = cardData.filter(
-            (card) => card.startZone === zone.Name && card.playerId === "0"
+        const zoneId = `${row.RowName}-${zone.Name}`
+        if (!updatedCards[zoneId]) {
+          updatedCards[zoneId] = cardData.filter(
+            (card) => card.startZone === zoneId && card.playerId === "0"
           );
         }
       });
@@ -211,67 +216,72 @@ export function Page({ cardData, gameSetup }: { cardData?: CardData[] | null, ga
   }
 
   return (
-    <div className="app">
-      <div className="play-area">
-        <DndProvider backend={HTML5Backend}>
-          <div className="area-row">
-            <PlayZone
-              zoneName="Play"
-              cards={cards.Play}
-              onZoneDrop={handleZoneDrop}
-
-              cardDisplayType={CardFace.Both}
-            />
-            <div className="shared-zones">
-              {game.SharedZones.map((row) => (
-                <div key={row.RowName} className="shared-zone-row">
-                  {row.Zones.map((zone) => (
+    <PlayArea>
+      <DndProvider backend={HTML5Backend}>
+        <div className="shared-area">
+          <FreeZone
+            zoneName="Play"
+            cards={cards.Play}
+            onZoneDrop={handleZoneDrop}
+            cardDisplayType={CardFace.Both}
+            cardTypeComponentMap={game.CardTypeComponentMap}
+          />
+          <div className="shared-zones">
+            {game.SharedZones.map((row) => (
+              <div key={row.RowName} className="shared-zone-row">
+                {row.Zones.map((zone) => {
+                  const zoneId = `${row.RowName}-${zone.Name}`; // Construct the same zoneId used in initialization
+                  return (
                     <CardZone
-                      key={zone.Name}
-                      zoneName={zone.Name}
+                      key={zoneId}
+                      zoneId={zoneId}
+                      text={zone.Name}
                       zoneType={zone.ZoneType}
                       textPosition={zone.TextPosition}
                       cardRotation={zone.CardRotation}
-                      cards={cards[zone.Name]}
+                      cards={cards[zoneId]}
+                      cardTypeComponentMap={game.CardTypeComponentMap}
                       onZoneDrop={handleZoneDrop}
                       onCardDrop={handleCardDrop}
                       cardDisplayType={zone.CardDisplay}
                     />
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* For each Player create a player zone */}
-          <div className="player-area">
-            {Array.from({ length: game.Players }, (_, i) => i + 1).map((playerId) => (
-              <div key={playerId} className="player-zone">
-                {game.PlayerZones.map((row) => (
-                  <div key={row.RowName} className="zones-row">
-                    {row.Zones.map((zone) => {
-                      const zoneId = `${zone.Name}-${playerId}`; // Unique ID for player-specific zones
-                      return (
-                        <CardZone
-                          key={zoneId}
-                          zoneName={zoneId}
-                          zoneType={zone.ZoneType}
-                          textPosition={zone.TextPosition}
-                          cardRotation={zone.CardRotation}
-                          cards={cards[zoneId]}
-                          onZoneDrop={handleZoneDrop}
-                          onCardDrop={handleCardDrop}
-                          cardDisplayType={zone.CardDisplay}
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
           </div>
-        </DndProvider>
-      </div>
-    </div>
+        </div>
+        {/* For each Player create a player zone */}
+        <div className="player-area">
+          {Array.from({ length: game.Players }, (_, i) => i + 1).map((playerId) => (
+            <div key={playerId} className="player-zones">
+              {game.PlayerZones.map((row) => (
+                <div key={row.RowName} className="player-zone-row">
+                  {row.Zones.map((zone) => {
+                    const zoneId = `${zone.Name}-${playerId}`; // Unique ID for player-specific zones
+                    return (
+                      <CardZone
+                        key={zoneId}
+                        zoneId={zoneId}
+                        zoneType={zone.ZoneType}
+                        text={zone.Name}
+                        textPosition={zone.TextPosition}
+                        cardRotation={zone.CardRotation}
+                        cards={cards[zoneId]}
+                        cardTypeComponentMap={game.CardTypeComponentMap}
+                        onZoneDrop={handleZoneDrop}
+                        onCardDrop={handleCardDrop}
+                        cardDisplayType={zone.CardDisplay}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </DndProvider>
+    </PlayArea>
   );
 }
 

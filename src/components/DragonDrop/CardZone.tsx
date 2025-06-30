@@ -1,18 +1,19 @@
 import React, { useRef } from "react";
-import Card from "components/Card";
-import Zone from "components/Zone";
+import Card from "./Card";
+import Zone from "./Zone";
 import "./Zone.css"; // Import the Zone CSS file
 
-import { CardFace, CardZoneType, Position, Rotation } from "enums";
+import { CardFace, CardType, CardZoneType, Position, Rotation } from "enums";
 import { CardData } from "types";
 
 interface CardZoneProps {
-  zoneName: string;
+  zoneId: string;
   zoneType?: CardZoneType; // Type of the zone (Stack or Bar)
   textPosition?: Position; // Position of the text
   rotate?: Rotation; // Rotation of the text
   text?: string; // Optional text prop for the zone title
   cards: CardData[];
+  cardTypeComponentMap: Record<CardType, React.ComponentType<any>>,
   onZoneDrop: (cardId: string, zoneName: string) => void;
   onCardDrop?: (cardId: string, hoverIndex: number, zoneName: string) => void
   cardDisplayType?: CardFace;
@@ -20,18 +21,19 @@ interface CardZoneProps {
 }
 
 const CardZone: React.FC<CardZoneProps> = ({
-  zoneName,
+  zoneId,
   zoneType = CardZoneType.Bar, // Default to Bar zone type
   textPosition = Position.Left,
   rotate = Rotation.Normal,
   text,
   cards,
+  cardTypeComponentMap,
   onZoneDrop,
   onCardDrop,
   cardDisplayType = CardFace.FaceUp,
   cardRotation = Rotation.Normal, // Default to normal rotation for cards
 }) => {
-  text = text || zoneName; // Default to zoneName if text is not provided
+  text = text || zoneId; // Default to zoneName if text is not provided
   const shownCards: CardData[] =
     zoneType === CardZoneType.Stack
       ? cards?.slice(-1) || [] // Show only the top card in stack zone
@@ -77,7 +79,7 @@ const CardZone: React.FC<CardZoneProps> = ({
       <div className={`zone-text rotate-${rotate}`}>{text}</div>
 
       {/* The zone */}
-      <Zone zoneName={zoneName} onZoneDrop={onZoneDrop}>
+      <Zone zoneName={zoneId} onZoneDrop={onZoneDrop}>
         <div
           className={className}
           ref={scrollContainerRef}
@@ -91,9 +93,10 @@ const CardZone: React.FC<CardZoneProps> = ({
               key={card.id}
               card={card}
               index={index}
-              zoneName={zoneName}
+              zoneName={zoneId}
               onCardDrop={onCardDrop}
               cardDisplayType={cardDisplayType}
+              cardTypeComponentMap={cardTypeComponentMap}
               rotate={cardRotation} // Pass rotation prop to Card component
             />
           ))}

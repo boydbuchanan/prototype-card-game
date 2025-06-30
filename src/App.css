@@ -1,59 +1,8 @@
-:root {
-  --background: #ffffff;
-  --foreground: #3b3b3b;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+.center-text {
+  text-align: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #3b3b3b;
-    --foreground: #ededed;
-  }
-}
-html {
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
-  
-}
-
-.nav-link {
-  text-decoration: none;
-  color: var(--foreground, #3b3b3b);
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 4px;
-  transition: background 0.15s;
-  margin-right: 12px;
-}
-
-.nav-link:last-child {
-  margin-right: 0;
-}
-
-.nav-link:hover {
-  background: rgba(98, 141, 184, 0.685);
-}
-.nav-button {
-  background: var(--background);
-  color: var(--foreground);
-  border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s;
-}
-.nav-button:hover {
-  background: rgba(98, 141, 184, 0.685);
-}
-.nav-button:disabled {
-  background: rgba(98, 141, 184, 0.2);
-  cursor: not-allowed;
+.no-scroll {
+  overflow: hidden; /* Disable scrolling */
 }

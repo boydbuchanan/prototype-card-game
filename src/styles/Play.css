@@ -1,56 +1,65 @@
+:root {
+  /* Size variables */
+  --gap-small: 5px;
+  --gap-standard: 10px;
+  --gap-large: 20px;
+  --border-width-thin: 1px;
+  --border-width-standard: 2px;
+  
+  /* Card dimensions */
+  --card-width: 146px;
+  --card-height: 210px;
+  
+  /* Zone dimensions */
+  --play-zone-min-height: 550px;
+  --play-zone-min-width: 1200px;
+  --bar-zone-height: 254px;
+  --bar-zone-width: 830px;
+  --single-card-width: 170px;
+  --single-card-height: 254px;
+}
+
 .play-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+}
+.shared-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-standard); /* Adjust the gap between cards as needed */
 }
 .player-area {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Adjust the gap between cards as needed */
+  gap: var(--gap-standard); /* Adjust the gap between cards as needed */
   width: 100%;
   overflow: auto;
 }
+.play-zone {
+  gap: var(--gap-standard); /* Adjust the gap between cards as needed */
+  min-height: var(--play-zone-min-height); /* Set a minimum height for the drop zone */
+  min-width: var(--play-zone-min-width); /* Set a minimum width for the drop zone */
+  border: var(--border-width-standard) dashed var(--border); /* Add a dashed border for the drop zone */
+}
+.bar-zone {
+  min-height: var(--bar-zone-height); /* Set a minimum height for the drop zone */
+  min-width: var(--bar-zone-width);
+  max-width: var(--bar-zone-width);
+  border: var(--border-width-standard) dashed var(--border); /* Add a dashed border for the drop zone */
+  overflow-y: hidden;
+  gap: var(--gap-standard); /* Adjust the gap between cards as needed */
+}
+.single-card-zone {
+  width: var(--single-card-width);
+  height: var(--single-card-height);
+  border: var(--border-width-standard) dashed var(--border);
+}
 
 .player-zone {
-  /* border: 1px dashed #f3f3f3; */
+  border: var(--border-width-thin) dashed #2575d0;
 }
 
-.area-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px; /* Adjust the gap between cards as needed */
-}
-
-.shared-zones {
-
-}
-
-.shared-zone-row {
-
-}
-.no-scroll {
-  overflow: hidden; /* Disable scrolling */
-}
-.scroll-style {
-  scrollbar-gutter: stable; /* Reserve space for the scrollbar */
-  
-  scrollbar-width: thin;
-  scrollbar-color: #888888 #f5f5f5;
-}
-
-.scroll-style::-webkit-scrollbar {
-  width: 8px;
-}
-
-.scroll-style::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-.scroll-style::-webkit-scrollbar-thumb {
-  background: #888888;
-  border-radius: 4px;
-}

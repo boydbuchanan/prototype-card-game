@@ -21,3 +21,7 @@ export enum CardFace {
   FaceDown = "faceDown",
   Both = "both",
 }
+export enum CardType {
+  Content = "content",
+  Sandwich = "sandwich",
+}

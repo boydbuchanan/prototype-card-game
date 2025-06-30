@@ -1,20 +1,23 @@
 
-import { CardFace, CardZoneType, Position, Rotation } from "enums";
+import { CardFace, CardType, CardZoneType, Position, Rotation } from "enums";
 
 // Define the CardData type
 export interface CardData {
   id: string;
   cardName: string;
-  cardType: string;
+  cardType: CardType;
   cardText: string;
   cardColor: string;
   startZone: string;
   playerId: string;
+  canDrag?: boolean;
+  clickRotate?: boolean;
 }
 
 export interface GameSetup {
   Players: number;
   Cards: CardData[],
+  CardTypeComponentMap: Record<CardType, React.ComponentType<any>>,
   SharedZones: RowSetup[],
   PlayerZones: RowSetup[],
 }
