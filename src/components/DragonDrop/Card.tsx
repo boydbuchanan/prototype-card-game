@@ -53,7 +53,7 @@ const Card: React.FC<CardProps> = ({
   
   const [rotation, setRotation] = useState<number>(initialRotate); // State for rotation
   
-  const [{ isOver, canDrop }, drop] = useDrop<DragItem, void, DropCollectedProps>({
+  const [{ isOver }, drop] = useDrop<DragItem, void, DropCollectedProps>({
     accept: "card",
     drop: (item, monitor) => {
       if (!ref.current || !onCardDrop) return;
