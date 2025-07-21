@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkprototype_card_game=self.webpackChunkprototype_card_game||[]).push([[235],{235:(e,a,r)=>{r.r(a),r.d(a,{default:()=>t});r(43);var c=r(579);const t=e=>{let{card:a}=e;return(0,c.jsxs)(c.Fragment,{children:[(0,c.jsx)("h3",{className:"center-text",children:a.cardName}),(0,c.jsx)("p",{className:"card-text",children:a.cardText}),(0,c.jsx)("h4",{className:"center-text",children:a.cardType})]})}}}]);
+//# sourceMappingURL=235.e862be83.chunk.js.map
