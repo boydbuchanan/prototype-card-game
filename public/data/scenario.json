@@ -1,0 +1,30 @@
+{
+  "schema": "cardgame.scenario/v1",
+  "name": "Default layout",
+  "defaults": {
+    "zone": "Shared-Deck",
+    "byType": {
+      "Unit": {
+        "zone": "In Play",
+        "player": 1
+      }
+    }
+  },
+  "placements": [
+    {
+      "id": "1",
+      "zone": "Hand",
+      "player": 1
+    },
+    {
+      "id": "2",
+      "zone": "Hand",
+      "player": 2,
+      "rotation": 90
+    },
+    {
+      "id": "13",
+      "zone": "Tray-Tokens"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 {
-  "Players": 1,
+  "Players": 4,
   "Cards": [],
+  "TableShape": "square",
   "SharedZones": [
     {
       "RowName": "Shared",
@@ -15,7 +16,7 @@
           "Name": "Discard",
           "CardDisplay": "faceUp",
           "ZoneType": 0,
-          "TextPosition": "bottom"
+          "TextPosition": "top"
         }
       ]
     }
@@ -28,18 +29,6 @@
           "Name": "In Play",
           "CardDisplay": "both",
           "ZoneType": 1,
-          "TextPosition": "left"
-        }
-      ]
-    },
-    {
-      "RowName": "Resource",
-      "Zones": [
-        {
-          "Name": "Resource",
-          "CardDisplay": "faceUp",
-          "ZoneType": 1,
-          "CardRotation": "left",
           "TextPosition": "left"
         }
       ]
@@ -58,6 +47,19 @@
           "CardDisplay": "faceUp",
           "ZoneType": 0,
           "TextPosition": "right"
+        }
+      ]
+    }
+  ],
+  "TrayZones": [
+    {
+      "RowName": "Tray",
+      "Zones": [
+        {
+          "Name": "Tokens",
+          "CardDisplay": "faceUp",
+          "ZoneType": 2,
+          "TextPosition": "top"
         }
       ]
     }

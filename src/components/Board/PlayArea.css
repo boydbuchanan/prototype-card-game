@@ -1,0 +1,236 @@
+/* The play surface: the pan/zoom canvas, the table, the seats, the drag ghost
+   and the three screen-fixed overlays. Zones own only zone chrome; these rules
+   belong to PlayArea and the board it hosts. */
+
+@layer play {
+
+/* ---- canvas ---- */
+
+/* Pan is a separate layer with its own transform property and no transition, so
+   a pan frame is a straight write and the rect stays exactly measurable. */
+.play-pan {
+  position: relative;
+}
+
+.play-canvas {
+  position: relative;
+  transform-origin: center center;
+  /* Only the seat change animates. Zoom is stepped and pan is per-frame; either
+     one tweened here would lag the cursor and skew every rect read mid-drop. */
+  transition: rotate 0.25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .play-canvas { transition: none; }
+}
+
+.table-surface {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: var(--ct-border-standard) solid var(--border);
+  border-radius: var(--border-radius-large);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.shared-zones {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ct-gap-standard);
+}
+
+/* ---- seats ---- */
+
+.seat {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ct-gap-small);
+  padding: var(--ct-gap-standard);
+}
+.seat-empty { opacity: 0.4; }
+.seat-label {
+  font-size: 13px;
+  color: var(--foreground);
+  letter-spacing: 0.04em;
+}
+
+/* A free card sits directly on the canvas, positioned by its centre. */
+.free-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+/* The bottom margin exists to space cards inside a zone. Out here it would
+   offset the card from the point it is supposed to be centred on. */
+.free-card .card-container {
+  margin-bottom: 0;
+}
+
+/* The real card stays put and dims; the ghost follows the pointer. */
+.card-dragging {
+  opacity: 0.3;
+}
+
+/* A clone in screen space, so no ancestor transform can skew how it tracks. */
+.card-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  margin: 0;
+  z-index: 10001;
+  pointer-events: none;
+  transform-origin: center center;
+  transition: none;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
+}
+.card-ghost .card-toolbar { display: none; }
+
+/* While a card is being dragged, zones must not clip or scroll it — otherwise
+   the card cannot be pulled out of a zone and a scrollbar appears instead. */
+body.card-drag-active .zone-drop {
+  overflow: visible;
+}
+body.card-drag-active {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* ---- screen-fixed tray ---- */
+
+.tray {
+  position: fixed;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ct-gap-standard);
+  padding: var(--ct-gap-standard);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-medium);
+  box-shadow: 0 2px 12px var(--shadow);
+  max-height: 80vh;
+  overflow: auto;
+}
+
+/* ---- table controls ---- */
+
+/* Table shape, seat count and point of view: everything that changes how the
+   board is presented rather than what is on it. */
+.table-controls {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  max-width: calc(100vw - 32px);
+  padding: 6px 10px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-large);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* A hairline between groups, so the bar reads as three controls not one row. */
+.control-group + .control-group {
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
+}
+
+.control-label {
+  font-size: 12px;
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+.control-value {
+  min-width: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.control-button {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 12px;
+  cursor: pointer;
+}
+.control-button[aria-pressed="true"] {
+  background: var(--foreground);
+  color: var(--background);
+}
+.control-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---- zoom controls ---- */
+
+.zoom-controls {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-large);
+  box-shadow: 0 2px 12px var(--shadow);
+  color: var(--foreground);
+  font-size: 12px;
+}
+.zoom-controls button {
+  min-width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+/* ---- viewport ---- */
+
+.play-area-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  place-items: center;
+  touch-action: none; /* pointer drags own the gesture */
+  cursor: grab;
+}
+.play-area-viewport.panning { cursor: grabbing; }
+
+}

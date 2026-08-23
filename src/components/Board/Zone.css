@@ -1,0 +1,72 @@
+@layer play {
+
+/* ---- zone shell ---- */
+
+/* Container for the label and the zone itself */
+.zone-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+
+.zone-container.text-top { flex-direction: column; }
+.zone-container.text-bottom { flex-direction: column-reverse; }
+.zone-container.text-left { flex-direction: row; }
+.zone-container.text-right { flex-direction: row-reverse; }
+
+.zone-text {
+  font-size: 14px;
+  color: var(--foreground);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ---- the drop area ---- */
+
+.zone-drop {
+  display: flex;
+  gap: var(--ct-gap-standard);
+  border: var(--ct-border-standard) dashed var(--border);
+  border-radius: var(--border-radius-medium);
+  padding: var(--ct-gap-small);
+  /* An empty zone must still show its shape, so every kind has a minimum size. */
+  box-sizing: content-box;
+}
+
+.stack-zone {
+  justify-content: center;
+  align-items: center;
+  width: var(--ct-card-width);
+  height: var(--ct-card-height);
+}
+
+.row-zone {
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-start;
+  min-width: var(--ct-row-zone-width);
+  min-height: var(--ct-card-height);
+  overflow-x: auto;
+}
+
+.column-zone {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: var(--ct-card-width);
+  min-height: var(--ct-column-zone-height);
+  overflow-y: auto;
+}
+
+.player-zone-row,
+.shared-zone-row,
+.tray-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--ct-gap-standard);
+}
+
+}

@@ -1,3 +1,13 @@
+/* Site chrome first, play area second: play-area rules always win
+   over site styles regardless of selector specificity. */
+@layer site, play;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

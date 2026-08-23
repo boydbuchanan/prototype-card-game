@@ -1,0 +1,106 @@
+@layer play {
+.card-container {
+  position: relative; /* Ensure the toolbar is positioned relative to the card container */
+  display: flex;
+  justify-content: center;
+  z-index: var(--ct-z-card-container); /* Ensure card container creates proper stacking context */
+  margin-bottom: var(--ct-card-margin-bottom);
+  /* The card rotates inside; the container swaps its footprint to match, so a
+     turned card takes the right amount of room in a row or column. */
+  width: var(--ct-card-width);
+  height: var(--ct-card-height);
+  transition: width 0.2s ease, height 0.2s ease;
+}
+.card-container.card-sideways {
+  width: var(--ct-card-height);
+  height: var(--ct-card-width);
+}
+.card {
+  position: relative; /* template regions position against the card */
+  width: var(--ct-card-width);
+  height: var(--ct-card-height);
+  border-radius: var(--border-radius-medium);
+  border: 1px solid var(--ct-card-border);
+  padding: var(--ct-card-padding);
+  background-color: var(--ct-card-bg);
+  transition: transform var(--transition-duration) ease; /* Smooth rotation */
+  align-self: center;
+  z-index: var(--ct-z-card);
+
+  /* Style boundary: a card face must not inherit text properties from the zone or
+     the page. A Bar zone sets white-space: nowrap on its scroll container, which
+     otherwise reaches card text and stops it wrapping. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  font-style: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.card input, .card button, .card [type="range"] {
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
+.card-toolbar {
+  position: absolute;
+  top: var(--ct-toolbar-top-offset); /* Center the toolbar vertically */
+  right: 0; /* Position the toolbar to the right of the card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ct-toolbar-gap); /* Add spacing between buttons */
+  z-index: var(--ct-z-toolbar);
+  height: auto;
+  width: auto;
+}
+
+/* Show the toolbar when hovering over the card-container or the toolbar itself */
+.card-container:hover .card-toolbar .toolbar-button,
+.card-toolbar:hover .toolbar-button {
+  display: flex; 
+}
+.card-container:hover .card-toolbar,
+.card-toolbar:hover {
+  /* background half transparent */
+  background-color: var(--ct-toolbar-bg-semi); /* Semi-transparent background */
+  padding: var(--ct-toolbar-padding); /* Add padding to the toolbar */
+  border-radius: var(--border-radius-small); /* Rounded corners for the toolbar */
+}
+.toolbar-button:hover {
+  background-color: var(--ct-toolbar-bg-hover-semi); /* Change background on hover */
+  color: var(--ct-toolbar-text-hover);
+}
+
+.toolbar-button {
+  background-color: var(--ct-toolbar-bg);
+  box-shadow: 0 2px 4px var(--shadow); 
+  color: var(--ct-card-border);
+  border: none;
+  border-radius: var(--border-radius-small);
+  padding: 0px;
+  cursor: pointer;
+  align-self: center;
+  font-size: var(--font-size-large);
+  width: var(--ct-toolbar-button-size);
+  height: var(--ct-toolbar-button-size);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.toolbar-button:hover {
+  background-color: var(--ct-toolbar-bg-hover);
+}
+
+
+.card.card-back {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    var(--ct-card-border) 3px,
+    var(--ct-card-border) 4px
+  );
+}
+}

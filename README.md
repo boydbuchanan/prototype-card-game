@@ -46,9 +46,11 @@ View @ [boydbuchanan.github.io/prototype-card-game](https://boydbuchanan.github.
 
 2. **Run the development server:**
    ```sh
-   npm start
+   npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   Open [http://localhost:5173/prototype-card-game/](http://localhost:5173/prototype-card-game/)
+   to view it in your browser. The path comes from `base` in `vite.config.ts`, which is the
+   same in development and production so a base-path mistake shows up locally.
 
 3. **Build for production:**
    ```sh
@@ -65,10 +67,11 @@ View @ [boydbuchanan.github.io/prototype-card-game](https://boydbuchanan.github.
 
 ## Available Scripts
 
-- `npm start` — Runs the app in development mode.
-- `npm test` — Launches the test runner.
-- `npm run build` — Builds the app for production.
-- `npm run eject` — Ejects the app (not recommended unless you need full control).
+- `npm run dev` (or `npm start`) — Runs the Vite dev server.
+- `npm test` — Runs the Vitest suite.
+- `npm run build` — Type-checks, then builds for production into `build/`.
+- `npm run preview` — Serves the production build locally.
+- `npm run deploy` — Builds and publishes `build/` to GitHub Pages.
 
 ---
 
@@ -159,10 +162,29 @@ You can also rotate a card by left- or right-clicking on it. The toolbar is posi
 
 ---
 
+## Table Controls
+
+The bar at the bottom of the play area changes how the table is presented, not what is on it:
+
+- **Table** — switch between a square and a rectangle.
+- **Players** — add or remove seats. Removing a seat leaves its cards exactly where they were
+  sitting, as free cards on the canvas; nothing is discarded by reshaping the table mid-game.
+- **View from** — turn the board so a given seat faces you.
+
+Seats past the player count still show, greyed out, so the shape of the table stays readable.
+They have no zones and cannot take a drop.
+
+The initial seat count comes from `players` in the scenario, falling back to `Players` in the
+game setup.
+
+**Moving around:** drag the background to pan, or use the wheel. Ctrl/Cmd + wheel zooms.
+
+---
+
 ## Learn More
 
-- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
-- [React documentation](https://reactjs.org/)
+- [Vite documentation](https://vite.dev/guide/)
+- [React documentation](https://react.dev/)
 
 ## Attribution
 

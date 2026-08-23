@@ -1,104 +1,159 @@
 import React from "react";
-import "../App.css";
 
-export default function InfoPage() {
-  return (
-    <div className="info-container">
-      <h1>GameSetup Structure</h1>
-      <p>
-        <strong>GameSetup</strong> is the main configuration object that defines the structure of your card game. It determines how many players there are, what cards are in the game, and how the play areas (zones) are organized.
-      </p>
-      <h2>Structure</h2>
-      <pre className="info-pre">
-{`interface GameSetup {
-  Players: number;           // Number of players in the game
-  Cards: CardData[];         // All cards in the game
-  SharedZones: RowSetup[];   // Zones shared by all players (e.g., Deck, Discard)
-  PlayerZones: RowSetup[];   // Zones each player has (e.g., Hand, In Play)
-}
+const InfoPage: React.FC = () => (
+  <div className="info-container">
+    <h1>Prototype Card Game</h1>
+    <p>
+      Drag-and-drop card prototyping. Four files describe a game, and each owns a different
+      concern — so you can change the board without touching the cards, or restyle the cards
+      without touching either.
+    </p>
 
-interface RowSetup {
-  RowName: string;           // Name of the row (e.g., "Shared", "Player")
-  Zones: ZoneSetup[];        // Array of zones in this row
-}
+    <h2>The four files</h2>
+    <table className="info-table">
+      <thead>
+        <tr><th>File</th><th>Owns</th><th>Upload as</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gameSetup.json</code></td><td>Zones, rows, player count</td><td>GameSetup JSON</td></tr>
+        <tr><td><code>cardTemplates.json</code></td><td>How a card looks</td><td>Card Templates</td></tr>
+        <tr><td><code>cards.csv</code></td><td>What cards exist</td><td>Cards CSV</td></tr>
+        <tr><td><code>scenario.json</code></td><td>Where cards are, and how they sit</td><td>Scenario</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Nothing is uploaded to a server — every file is read in your browser. <b>Save Board</b>
+      writes the current state back out as a scenario, so you can stop mid-game and pick up
+      exactly where you left off.
+    </p>
 
-interface ZoneSetup {
-  Name: string;              // Name of the zone (e.g., "Deck", "Hand")
-  CardDisplay: CardFace;     // How cards are displayed (FaceUp, FaceDown, Both)
-  ZoneType: CardZoneType;    // Type of zone (Stack, Bar, etc.)
-  CardRotation?: Rotation;   // Optional: rotation of cards in this zone
-  TextPosition?: Position;   // Optional: where the zone label appears
-}`}
-      </pre>
-      <h2>How it works</h2>
-      <ul>
-        <li>
-          <strong>Players</strong>: Sets the number of players. Used to generate player-specific zones.
-        </li>
-        <li>
-          <strong>Cards</strong>: The list of all cards in the game, usually loaded from a CSV file.
-        </li>
-        <li>
-          <strong>SharedZones</strong>: Defines rows of zones that are shared by all players (e.g., Deck, Discard).
-        </li>
-        <li>
-          <strong>PlayerZones</strong>: Defines rows of zones that each player gets (e.g., Hand, In Play, Resource).
-        </li>
-      </ul>
-      <h2>Example</h2>
-      <pre className="info-pre">
-{`const gameSetup: GameSetup = {
-  Players: 1,
-  Cards: [],
-  SharedZones: [
-    {
-      RowName: "Shared",
-      Zones: [
-        { Name: "Deck", CardDisplay: CardFace.FaceDown, ZoneType: CardZoneType.Stack, TextPosition: Position.Top },
-        { Name: "Discard", CardDisplay: CardFace.FaceUp, ZoneType: CardZoneType.Stack, TextPosition: Position.Bottom }
-      ]
-    }
+    <h2>gameSetup.json</h2>
+    <pre className="info-pre">{`{
+  "Players": 2,
+  "SharedZones": [
+    { "RowName": "Shared", "Zones": [
+      { "Name": "Play", "CardDisplay": "both",     "ZoneType": 1, "TextPosition": "top" },
+      { "Name": "Deck", "CardDisplay": "faceDown", "ZoneType": 0, "TextPosition": "top" }
+    ]}
   ],
-  PlayerZones: [
-    {
-      RowName: "Player",
-      Zones: [
-        { Name: "Hand", CardDisplay: CardFace.Both, ZoneType: CardZoneType.Bar, TextPosition: Position.Left }
+  "PlayerZones": [
+    { "RowName": "Player", "Zones": [
+      { "Name": "Hand", "CardDisplay": "both", "ZoneType": 1, "TextPosition": "left" }
+    ]}
+  ]
+}`}</pre>
+    <p>
+      <b>ZoneType is a number:</b> <code>0</code> Stack (shows the top card only),{" "}
+      <code>1</code> Row (ordered left to right), <code>2</code> Column (ordered top to
+      bottom). A zone only imposes order — to place a card anywhere, drop it on the canvas
+      outside every zone. <b>CardDisplay</b> is <code>"faceUp"</code>, <code>"faceDown"</code>{" "}
+      or <code>"both"</code>, and sets which way up a card starts.
+    </p>
+    <p>
+      <b>Zone ids.</b> A shared zone's id is <code>RowName-Name</code>; a player zone's is{" "}
+      <code>Name-playerNumber</code>. Scenarios address zones by these ids, so player zone
+      names must be unique across all player rows.
+    </p>
+
+    <h2>cards.csv</h2>
+    <pre className="info-pre">{`id,cardName,cardType,state,left,right,explain
+1,Hammer,Item,Inactive,Equip,Swing,3 damage to one target`}</pre>
+    <p>
+      Only <code>id</code>, <code>cardName</code> and <code>cardType</code> are fixed, and{" "}
+      <code>id</code> must be unique. Every other column is yours: a card template pulls a
+      column by name. Cards carry no styling and no position — those live in the template and
+      the scenario.
+    </p>
+
+    <h2>cardTemplates.json</h2>
+    <p>
+      Templates are keyed by <code>cardType</code>, with <code>default</code> used for any type
+      that has none. A template is a list of regions; a region is a rect on the card that draws
+      a background and, optionally, text from one column.
+    </p>
+    <pre className="info-pre">{`{
+  "card": { "width": 146, "height": 220, "radius": 8 },
+  "styles": { "active": { "bg": "#E8791A", "color": "#1A0F04", "weight": 600 } },
+  "templates": {
+    "Item": {
+      "frame": "frames/item.svg",
+      "regions": [
+        { "rect": [12, 0, 76, 8], "rotate": 180, "column": "state", "style": "active" },
+        { "rect": [0, 8, 13, 62], "rotate": 90,  "column": "left",  "style": "active" }
       ]
     }
+  }
+}`}</pre>
+    <p>
+      <code>rect</code> is <code>[x, y, w, h]</code> as a percentage of the card. Regions draw
+      in order, so later ones paint over earlier ones. Style properties — <code>bg</code>,{" "}
+      <code>color</code>, <code>size</code>, <code>weight</code>, <code>align</code> — can be
+      named in <code>styles</code>, written inline, or set on the region to override it. Text
+      always wraps.
+    </p>
+    <p>
+      <b><code>rotate</code> is where the region is printed</b>, fixed at authoring time — a
+      printed card's ink doesn't move when you turn the card. A region reads upright when{" "}
+      <code>cardRotation + rotate ≡ 0°</code>, so one card face can carry a different ruleset
+      on each edge.
+    </p>
+
+    <h2>scenario.json</h2>
+    <pre className="info-pre">{`{
+  "name": "Turn 3",
+  "players": 4,
+  "defaults": {
+    "zone": "Shared-Deck",
+    "byType": { "Item": { "zone": "Hand", "player": 1 } }
+  },
+  "placements": [
+    { "id": "1", "zone": "Hand", "player": 1, "rotation": 90, "faceUp": true },
+    { "id": "7", "zone": "Shared-Play", "x": 320, "y": 180 }
   ]
-};`}
-      </pre>
-      <h2>Customizing</h2>
-      <ul>
-        <li>
-          Add or remove zones and rows to fit your game’s needs.
-        </li>
-        <li>
-          Use <strong>CardDisplay</strong> to control if cards are face up, face down, or both.
-        </li>
-        <li>
-          Use <strong>ZoneType</strong> to control how cards are arranged (stacked, in a row, etc).
-        </li>
-        <li>
-          <strong>CardRotation</strong> and <strong>TextPosition</strong> are optional for layout tweaks.
-        </li>
-      </ul>
-      <h2>Card Rotation & Toolbar Functions</h2>
-      <p>
-        Each card features a floating toolbar that appears when you hover over the card. The toolbar provides quick actions:
-      </p>
-      <ul>
-        <li>
-          <strong>👁 (Eye):</strong> Flip the card face up or face down.
-        </li>
-        <li>
-          <strong>▲ ◄ ► ▼ (Arrows):</strong> Instantly rotate the card to normal, left, right, or upside-down orientation.
-        </li>
-      </ul>
-      <p>
-        You can also rotate a card by left- or right-clicking on it. The toolbar is positioned above the card and will remain visible as long as your mouse is over the card or the toolbar itself.
-      </p>
-    </div>
-  );
-}
+}`}</pre>
+    <p>
+      Resolution order per card: an explicit <code>placement</code>, then a <code>byType</code>{" "}
+      default, then the scenario-wide default, then the first zone in the setup. So a scenario
+      is usually short — you only spell out what's unusual.
+    </p>
+    <p>
+      <code>players</code> seats the table, overriding <code>Players</code> in the setup. It is a
+      starting point, not a lock — the table controls change the seat count while you play.
+    </p>
+    <p>
+      The same shape is a starting setup, a save file and a scenario definition. That is what
+      makes a quest, a boss fight, or one specific mid-turn position just another file.
+    </p>
+
+    <h2>Table controls</h2>
+    <p>
+      The bar at the bottom of the play area changes how the table is presented, not what is on
+      it. <b>Table</b> switches between a square and a rectangle, <b>Players</b> adds and removes
+      seats, and <b>View from</b> turns the board so a given seat faces you.
+    </p>
+    <p>
+      Removing a seat does not discard its cards: each one stays exactly where it was sitting and
+      becomes a free card on the canvas, so nothing is lost by reshaping the table mid-game. Seats
+      past the player count still appear, greyed out, so the shape of the table stays readable —
+      but they have no zones and cannot take a drop.
+    </p>
+    <p>
+      <b>Moving around:</b> drag the background to pan, or use the wheel. Ctrl/Cmd + wheel zooms,
+      as do the controls in the bottom right.
+    </p>
+
+    <h2>Card controls</h2>
+    <ul>
+      <li><b>Drag</b> to move a card between zones, or anywhere inside a Free zone.</li>
+      <li><b>Left click</b> rotates counter-clockwise, <b>right click</b> clockwise.</li>
+      <li><b>Toolbar</b>: 👁 flips the card; ▲ ◄ ► ▼ set orientation directly.</li>
+    </ul>
+    <p>
+      Rotation, face and position belong to the card's board state rather than to the zone it
+      sits in — so a card keeps its orientation when you move it, and <b>Save Board</b> records
+      it.
+    </p>
+  </div>
+);
+
+export default InfoPage;

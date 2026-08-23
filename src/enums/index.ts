@@ -12,16 +12,19 @@ export enum Position {
   Right = "right",
   Bottom = "bottom",
 }
+/** Zones only impose order. Free placement is what the canvas does. */
 export enum CardZoneType {
   Stack,
-  Bar,
+  Row,
+  Column,
+}
+
+export enum TableShape {
+  Square = "square",
+  Rectangle = "rectangle",
 }
 export enum CardFace {
   FaceUp = "faceUp",
   FaceDown = "faceDown",
   Both = "both",
-}
-export enum CardType {
-  Content = "content",
-  Sandwich = "sandwich",
 }

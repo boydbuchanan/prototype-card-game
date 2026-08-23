@@ -1,8 +1,54 @@
-
+@layer site {
 .center-text {
   text-align: center;
 }
 
-.no-scroll {
-  overflow: hidden; /* Disable scrolling */
+
+/* App shell: a column of header + content, sized to the window. The content
+   area takes whatever the header leaves, so no rule anywhere needs to know how
+   tall the header is. */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;   /* a flex item defaults to min-content; without this it cannot shrink */
+  overflow: auto;  /* long pages (Info) scroll here, not the window */
+}
+
+.app-header {
+  flex: none;
+  position: relative;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0;
+  background: var(--background, #fff);
+  border-bottom: 1px solid var(--border, #ccc);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
+}
+
+.app-title {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--foreground, #3b3b3b);
+}
+
+.app-byline {
+  display: block;
+  font-size: 13px;
+  color: var(--foreground, #888);
+}
+
+.app-nav,
+.app-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 24px;
+}
 }

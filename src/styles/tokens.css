@@ -1,0 +1,51 @@
+@layer site, play;
+
+/* Play-area design tokens.
+   Namespaced --ct-* and scoped to .ct-root so the surrounding site can never
+   collide with them, and so an embedded board carries its own values. */
+
+/* Card geometry is the one thing a card template owns. TemplateProvider writes
+   the loaded template's size onto :root at runtime, so it must be declared here
+   and nowhere closer — a copy on .ct-root would shadow it for the whole board,
+   and the drag ghost lives on document.body, outside .ct-root entirely. */
+:root {
+  --ct-card-width: 146px;
+  --ct-card-height: 220px;
+}
+
+.ct-root,
+:root {
+  /* Card */
+  --ct-card-padding: 2px;
+  --ct-card-margin: 2px;
+  --ct-card-margin-bottom: 6px;
+  --ct-card-bg: #f0f0f0;
+  --ct-card-border: #000;
+
+  /* Card toolbar */
+  --ct-toolbar-gap: 5px;
+  --ct-toolbar-padding: 5px;
+  --ct-toolbar-top-offset: -34px;
+  --ct-toolbar-button-size: 24px;
+  --ct-toolbar-bg: rgb(223, 223, 223);
+  --ct-toolbar-bg-hover: #f0f0f0;
+  --ct-toolbar-bg-semi: rgba(255, 255, 255, 0.2);
+  --ct-toolbar-bg-hover-semi: rgba(255, 255, 255, 0.5);
+  --ct-toolbar-text-hover: #6396da;
+
+  /* Zones */
+  --ct-row-zone-width: 640px;
+  --ct-column-zone-height: 480px;
+
+  /* Layout */
+  --ct-gap-small: 5px;
+  --ct-gap-standard: 10px;
+  --ct-gap-large: 20px;
+  --ct-border-thin: 1px;
+  --ct-border-standard: 2px;
+
+  /* Z-index */
+  --ct-z-toolbar: 999;
+  --ct-z-card-container: 100;
+  --ct-z-card: 9;
+}

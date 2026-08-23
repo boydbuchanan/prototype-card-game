@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import 'App.css';
 import "styles/theme.css";
@@ -6,191 +6,113 @@ import PlayingCardsLogo from 'CardsLogo';
 import Home, { defaultSetup } from 'pages/Home';
 import InfoPage from 'pages/Info';
 
-import Papa from 'papaparse';
-import { CardData, GameSetup } from 'types';
+import { BoardState, CardData, CardTemplates, GameSetup, Scenario } from 'types';
+import { toScenario } from 'components/Game/scenario';
+import { TemplateProvider } from 'components/Game/TemplateContext';
+import {
+  asset, downloadJson, downloadUrl, fetchOptionalJson, parseCards, readCards, readJson,
+} from 'components/Game/files';
+
+/** A hidden file input paired with the button that opens it. */
+const UploadButton: React.FC<{
+  label: string;
+  accept: string;
+  onPick: (input: HTMLInputElement | null) => void;
+}> = ({ label, accept, onPick }) => {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <>
+      <button className="nav-button" onClick={() => ref.current?.click()}>{label}</button>
+      <input type="file" accept={accept} ref={ref} hidden onChange={() => onPick(ref.current)} />
+    </>
+  );
+};
 
 function App() {
-  const [game, setGameState] = useState<GameSetup>(defaultSetup);
+  const [game, setGame] = useState<GameSetup>(defaultSetup);
   const [cards, setCards] = useState<CardData[]>([]);
-  
-  // Reference for the hidden file input
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const gameSetupInputRef = useRef<HTMLInputElement>(null);
+  const [templates, setTemplates] = useState<CardTemplates | null>(null);
+  const [scenario, setScenario] = useState<Scenario | null>(null);
+  // Live board, mirrored up from Home so it can be saved.
+  const boardRef = useRef<{ state: BoardState; order: Record<string, string[]>; players: number }>(
+    { state: {}, order: {}, players: 1 }
+  );
 
-  // Dynamically set basename for deployed, empty for local dev
-  const basename = process.env.PUBLIC_URL?.replace(/https?:\/\/[^/]+/, "") || "";
-
-  // Load cards.csv by default on mount
+  // Everything the project ships, loaded once. Templates and the scenario are
+  // optional: without them cards render blank, or fall back to the first zone.
   useEffect(() => {
-    const csvUrl = `${process.env.PUBLIC_URL}/data/cards.csv`;
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csvText => {
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transform: (value, field) => {
-            // Convert boolean-like strings to actual booleans
-            if (value === 'true') return true;
-            if (value === 'false') return false;
-            // Keep everything else as-is
-            return value;
-          },
-          complete: (results) => {
-            const parsedData = results.data as CardData[];
-            setCards(parsedData);
-          },
-          error: (error: any) => {
-            console.error("Error parsing default CSV:", error);
-          }
-        });
-      })
-      .catch(err => {
-        console.error("Failed to load default cards.csv:", err);
-      });
+    fetch(asset('data/cards.csv'))
+      .then((r) => r.text())
+      .then((text) => parseCards(text, setCards))
+      .catch((err) => console.error('Failed to load default cards.csv:', err));
+
+    fetchOptionalJson<CardTemplates>('data/cardTemplates.json').then((j) => j && setTemplates(j));
+    fetchOptionalJson<Scenario>('data/scenario.json').then((j) => j && setScenario(j));
   }, []);
 
-  // Trigger file input click
-  const handleUploadClick = () => fileInputRef.current?.click();
-  const handleGameSetupUploadClick = () => gameSetupInputRef.current?.click();
+  const handleBoardChange = useCallback((board: typeof boardRef.current) => {
+    boardRef.current = board;
+  }, []);
 
-  // Handle file upload for cards.csv
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const csvText = e.target?.result as string;
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        transform: (value, field) => {
-          // Convert boolean-like strings to actual booleans
-          if (value === 'true') return true;
-          if (value === 'false') return false;
-          // Keep everything else as-is
-          return value;
-        },
-        complete: (results) => {
-          const parsedData = results.data as CardData[];
-          setCards(parsedData);
-        },
-        error: (error: any) => {
-          console.error("Error parsing CSV:", error);
-        }
-      });
-    };
-    reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  // Handle file upload for gamesetup.json
-  const handleGameSetupFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const json = JSON.parse(e.target?.result as string);
-        setGameState(json);
-      } catch (err) {
-        console.error("Invalid GameSetup JSON:", err);
-      }
-    };
-    reader.readAsText(file);
-    if (gameSetupInputRef.current) gameSetupInputRef.current.value = "";
-  };
-
-  // Download helpers
-  const handleDownloadCards = () => {
-    const url = `${process.env.PUBLIC_URL}/data/cards.csv`;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "cards.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleDownloadGameSetup = () => {
-    const url = `${process.env.PUBLIC_URL}/data/gamesetup.json`;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "gamesetup.json";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Write the current board out as a scenario — a save file, or a new starting setup.
+  const handleSaveBoard = () => {
+    const { state, order, players } = boardRef.current;
+    downloadJson(toScenario(state, order, players, scenario?.name || 'Saved board'), 'scenario.json');
   };
 
   return (
-    <div style={{ height: '100%' }}>
-      <Router basename={basename}>
-        <header
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 1001,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "12px",
-            padding: "10px 0 10px 0",
-            background: "var(--background, #fff)",
-            borderBottom: "1px solid var(--border, #ccc)",
-            boxShadow: "0 2px 8px 0 rgba(0,0,0,0.03)",
-          }}
-        >
+    <div className="app-root">
+      <Router basename={import.meta.env.BASE_URL}>
+        <header className="app-header">
           <PlayingCardsLogo size={48} />
           <div>
-            <span style={{ fontWeight: 600, fontSize: 18, color: "var(--foreground, #3b3b3b)" }}>
-              Prototyping Card Game
-            </span>
-            <span style={{ display: "block", fontSize: 13, color: "var(--foreground, #888)" }}>
-              by <strong>Boyd Buchanan</strong>
-            </span>
+            <span className="app-title">Prototyping Card Game</span>
+            <span className="app-byline">by <strong>Boyd Buchanan</strong></span>
           </div>
-          <nav style={{ marginLeft: 24, display: "flex", gap: 8 }}>
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            <Link to="/info" className="nav-link">
-              Info
-            </Link>
+          <nav className="app-nav">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/info" className="nav-link">Info</Link>
           </nav>
-          <div style={{ marginLeft: 24, display: "flex", gap: 8 }}>
-            <button className="nav-button" onClick={handleUploadClick}>
-              Upload Cards CSV
-            </button>
-            <input
-              type="file"
+          <div className="app-actions">
+            <UploadButton
+              label="Upload Cards CSV"
               accept=".csv"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleFileChange}
+              onPick={(input) => readCards(input, setCards)}
             />
-            <button className="nav-button" onClick={handleGameSetupUploadClick}>
-              Upload GameSetup JSON
-            </button>
-            <input
-              type="file"
+            <UploadButton
+              label="Upload GameSetup JSON"
               accept=".json,application/json"
-              ref={gameSetupInputRef}
-              style={{ display: "none" }}
-              onChange={handleGameSetupFileChange}
+              onPick={(input) => readJson<GameSetup>(input, 'GameSetup', setGame)}
             />
-            <button className="nav-button" onClick={handleDownloadCards}>
+            <UploadButton
+              label="Upload Card Templates"
+              accept=".json,application/json"
+              onPick={(input) => readJson<CardTemplates>(input, 'CardTemplates', setTemplates)}
+            />
+            <UploadButton
+              label="Upload Scenario"
+              accept=".json,application/json"
+              onPick={(input) => readJson<Scenario>(input, 'Scenario', setScenario)}
+            />
+            <button className="nav-button" onClick={handleSaveBoard}>Save Board</button>
+            <button className="nav-button" onClick={() => downloadUrl(asset('data/cards.csv'), 'cards.csv')}>
               Download Cards CSV
             </button>
-            <button className="nav-button" onClick={handleDownloadGameSetup}>
+            {/* Filename is case-sensitive on GitHub Pages */}
+            <button className="nav-button" onClick={() => downloadUrl(asset('data/gameSetup.json'), 'gameSetup.json')}>
               Download GameSetup JSON
             </button>
           </div>
         </header>
-        
-        <Routes>
-          <Route path="/" element={<Home cardData={cards} gameSetup={game} />} />
-          <Route path="/info" element={<InfoPage />} />
-        </Routes>
+
+        <TemplateProvider templates={templates}>
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<Home cardData={cards} gameSetup={game} scenario={scenario} onBoardChange={handleBoardChange} />} />
+              <Route path="/info" element={<InfoPage />} />
+            </Routes>
+          </main>
+        </TemplateProvider>
       </Router>
     </div>
   );
