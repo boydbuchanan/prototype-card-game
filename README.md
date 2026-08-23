@@ -15,7 +15,7 @@ Card Actions
 - Click and Hold to drag cards
 - Left Click to turn counter clockwise
 - Right Click to turn clockwise
-- Toolbar: Show hide and quick set rotation
+- Card controls: click to rotate, Ctrl/Cmd + click to flip
 
 Import
 - Game Setup
@@ -32,7 +32,7 @@ View @ [boydbuchanan.github.io/prototype-card-game](https://boydbuchanan.github.
 - [How it Works](#how-it-works)
 - [Example](#example)
 - [Customizing](#customizing)
-- [Card Rotation & Toolbar Functions](#card-rotation--toolbar-functions)
+- [Card Controls](#card-controls)
 - [Learn More](#learn-more)
 
 ---
@@ -151,14 +151,17 @@ const gameSetup: GameSetup = {
 
 ---
 
-## Card Rotation & Toolbar Functions
+## Card Controls
 
-Each card features a floating toolbar that appears when you hover over the card. The toolbar provides quick actions:
+Cards are driven entirely by the pointer:
 
-- **👁 (Eye):** Flip the card face up or face down.
-- **▲ ◄ ► ▼ (Arrows):** Instantly rotate the card to normal, left, right, or upside-down orientation.
+- **Drag** to move a card into a zone, or onto the canvas to leave it loose.
+- **Left click** rotates counter-clockwise, **right click** rotates clockwise.
+- **Ctrl/Cmd + click** flips the card over.
 
-You can also rotate a card by left- or right-clicking on it. The toolbar is positioned above the card and will remain visible as long as your mouse is over the card or the toolbar itself.
+Rotation is unbounded on purpose — turning a card left from upright animates a quarter turn
+rather than three quarters the other way. Rotation, face and position belong to the card's
+board state, so a card keeps its orientation when it moves, and **Save Board** records it.
 
 ---
 

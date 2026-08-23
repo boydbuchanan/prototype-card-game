@@ -11,7 +11,6 @@ interface ZoneProps {
   cards: CardData[];
   board: BoardState;
   onRotateBy: (cardId: string, delta: number) => void;
-  onFlip: (cardId: string, faceUp: boolean) => void;
 }
 
 const CLASS_FOR: Record<CardZoneType, string> = {
@@ -25,7 +24,7 @@ const CLASS_FOR: Record<CardZoneType, string> = {
  * target by virtue of registering its element; hit-testing happens in the drag
  * layer, in screen space.
  */
-const Zone: React.FC<ZoneProps> = ({ zone, cards, board, onRotateBy, onFlip }) => {
+const Zone: React.FC<ZoneProps> = ({ zone, cards, board, onRotateBy }) => {
   const dropRef = useZoneTarget(zone.id);
   const zoneType = zone.type ?? CardZoneType.Row;
 
@@ -48,7 +47,6 @@ const Zone: React.FC<ZoneProps> = ({ zone, cards, board, onRotateBy, onFlip }) =
             card={card}
             state={board[String(card.id)]}
             onRotateBy={onRotateBy}
-            onFlip={onFlip}
           />
         ))}
       </div>

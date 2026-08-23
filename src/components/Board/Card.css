@@ -1,10 +1,10 @@
 @layer play {
 .card-container {
-  position: relative; /* Ensure the toolbar is positioned relative to the card container */
+  position: relative;
   display: flex;
   justify-content: center;
-  z-index: var(--ct-z-card-container); /* Ensure card container creates proper stacking context */
-  margin-bottom: var(--ct-card-margin-bottom);
+  z-index: var(--ct-z-card-container); /* the container creates the stacking context */
+  box-sizing: border-box;
   /* The card rotates inside; the container swaps its footprint to match, so a
      turned card takes the right amount of room in a row or column. */
   width: var(--ct-card-width);
@@ -17,12 +17,14 @@
 }
 .card {
   position: relative; /* template regions position against the card */
+  /* A card is a bare box at exactly the template's size. No border, radius or
+     background here: the template paints the whole face, so anything drawn from
+     CSS would be chrome the template cannot control or remove. */
+  box-sizing: border-box;
+  flex: none;
   width: var(--ct-card-width);
   height: var(--ct-card-height);
-  border-radius: var(--border-radius-medium);
-  border: 1px solid var(--ct-card-border);
-  padding: var(--ct-card-padding);
-  background-color: var(--ct-card-bg);
+  border-radius: var(--ct-card-radius);
   transition: transform var(--transition-duration) ease; /* Smooth rotation */
   align-self: center;
   z-index: var(--ct-z-card);
@@ -42,59 +44,9 @@
   position: relative;
   z-index: 10;
 }
-.card-toolbar {
-  position: absolute;
-  top: var(--ct-toolbar-top-offset); /* Center the toolbar vertically */
-  right: 0; /* Position the toolbar to the right of the card */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ct-toolbar-gap); /* Add spacing between buttons */
-  z-index: var(--ct-z-toolbar);
-  height: auto;
-  width: auto;
-}
-
-/* Show the toolbar when hovering over the card-container or the toolbar itself */
-.card-container:hover .card-toolbar .toolbar-button,
-.card-toolbar:hover .toolbar-button {
-  display: flex; 
-}
-.card-container:hover .card-toolbar,
-.card-toolbar:hover {
-  /* background half transparent */
-  background-color: var(--ct-toolbar-bg-semi); /* Semi-transparent background */
-  padding: var(--ct-toolbar-padding); /* Add padding to the toolbar */
-  border-radius: var(--border-radius-small); /* Rounded corners for the toolbar */
-}
-.toolbar-button:hover {
-  background-color: var(--ct-toolbar-bg-hover-semi); /* Change background on hover */
-  color: var(--ct-toolbar-text-hover);
-}
-
-.toolbar-button {
-  background-color: var(--ct-toolbar-bg);
-  box-shadow: 0 2px 4px var(--shadow); 
-  color: var(--ct-card-border);
-  border: none;
-  border-radius: var(--border-radius-small);
-  padding: 0px;
-  cursor: pointer;
-  align-self: center;
-  font-size: var(--font-size-large);
-  width: var(--ct-toolbar-button-size);
-  height: var(--ct-toolbar-button-size);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-.toolbar-button:hover {
-  background-color: var(--ct-toolbar-bg-hover);
-}
-
-
+/* The back is the one face no template describes, so the app draws it. */
 .card.card-back {
+  background-color: var(--ct-card-bg);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,

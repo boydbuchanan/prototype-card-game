@@ -2,17 +2,14 @@ import React from "react";
 import { CardData, CardTemplate as TemplateDef, CardTemplates, Region, RegionStyle } from "types";
 import "./CardTemplate.css";
 
-/** A `bg` value is an image if it looks like a URL/data URI/file, or is inline SVG. */
-function isSvg(v: string) {
-  return v.trim().startsWith("<svg");
-}
 function isImageUrl(v: string) {
-  return /^(data:|https?:|\.{0,2}\/)/.test(v) || /\.(svg|png|jpe?g|webp|gif)$/i.test(v);
+  const path = v.split(/[?#]/)[0];
+  return /^(data:|blob:|https?:|\.{0,2}\/)/.test(v) || /\.(svg|png|jpe?g|webp|gif|avif)$/i.test(path);
 }
 
 function backgroundStyle(bg?: string): React.CSSProperties {
-  if (!bg || isSvg(bg)) return {};
-  if (isImageUrl(bg)) return { backgroundImage: `url("${bg}")` };
+  if (!bg) return {};
+  if (isImageUrl(bg)) return { backgroundImage: `url("${bg.replace(/"/g, "%22")}")` };
   return { background: bg };
 }
 
@@ -54,10 +51,6 @@ const CardTemplateContent: React.FC<Props> = ({ card, template, templates }) => 
 
   return (
     <div className="card-template" style={backgroundStyle(template.frame)}>
-      {template.frame && isSvg(template.frame) && (
-        <div className="card-template-svg" dangerouslySetInnerHTML={{ __html: template.frame }} />
-      )}
-
       {template.regions.map((region, i) => {
         const s = resolveStyle(region, styles);
         const [x, y, w, h] = region.rect;
@@ -75,9 +68,6 @@ const CardTemplateContent: React.FC<Props> = ({ card, template, templates }) => 
               ...backgroundStyle(s.bg),
             }}
           >
-            {s.bg && isSvg(s.bg) && (
-              <div className="card-region-svg" dangerouslySetInnerHTML={{ __html: s.bg }} />
-            )}
             {value != null && value !== "" && (
               <div
                 className="card-region-text"

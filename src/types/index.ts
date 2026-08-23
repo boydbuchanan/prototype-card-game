@@ -98,7 +98,7 @@ export type RegionAlign = "start" | "center" | "end";
 
 /** Everything a region can be styled with. Set in `styles`, inline, or on the region. */
 export interface RegionStyle {
-  /** Colour, path, data URI, or inline SVG. */
+  /** A CSS colour or gradient, or the URL of an image (`.svg` included). */
   bg?: string;
   color?: string;
   /** px at the template's base card size; scales with the card. */
@@ -118,14 +118,15 @@ export interface Region extends RegionStyle {
 }
 
 export interface CardTemplate {
-  /** Card background. Path, data URI, or inline SVG. */
+  /** The card's background image: a URL, or a CSS colour or gradient. */
   frame?: string;
   regions: Region[];
 }
 
 export interface CardTemplates {
   schema?: string;
-  card: { width: number; height: number };
+  /** The card's size on the table, and the corner radius of its face. */
+  card: { width: number; height: number; radius?: number };
   styles?: Record<string, RegionStyle>;
   /** Keyed by cardType. */
   templates: Record<string, CardTemplate>;

@@ -21,11 +21,12 @@ export const TemplateProvider: React.FC<{
   useEffect(() => {
     const root = document.documentElement;
     const apply = (name: string, px?: number) => {
-      if (px) root.style.setProperty(name, `${px}px`);
-      else root.style.removeProperty(name);
+      if (px == null) root.style.removeProperty(name);
+      else root.style.setProperty(name, `${px}px`);
     };
     apply("--ct-card-width", templates?.card?.width);
     apply("--ct-card-height", templates?.card?.height);
+    apply("--ct-card-radius", templates?.card?.radius);
   }, [templates]);
 
   return <TemplateContext.Provider value={templates}>{children}</TemplateContext.Provider>;

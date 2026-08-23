@@ -76,6 +76,7 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   // change: two quick clicks on + land in one React batch, and reading state
   // there would make the second click repeat the first.
   const seatingRef = useRef(seating);
+
   const table = useMemo(() => buildTable(seating.shape, seating.players), [seating]);
 
   /** Which seat is brought to the bottom of the screen. A view control, not game state. */
@@ -156,8 +157,8 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   );
 
   /**
-   * All rotation goes through here, from both the toolbar and the two mouse
-   * buttons. Deltas rather than absolute angles, and deliberately unbounded:
+   * All rotation goes through here, from both mouse buttons. Deltas rather than
+   * absolute angles, and deliberately unbounded:
    * wrapping 0 to 270 would spin the card three quarters the wrong way.
    */
   const rotateBy = useCallback((cardId: string, delta: number) => {
@@ -168,15 +169,22 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
     });
   }, []);
 
-  const flipCard = useCallback((cardId: string, faceUp: boolean) => {
+  const toggleFace = useCallback((cardId: string) => {
     setBoard((prev) => {
       const cur = prev[cardId];
       if (!cur) return prev;
-      return { ...prev, [cardId]: { ...cur, faceUp } };
+      return { ...prev, [cardId]: { ...cur, faceUp: !cur.faceUp } };
     });
   }, []);
 
-  const rotateCcw = useCallback((cardId: string) => rotateBy(cardId, -90), [rotateBy]);
+  /** Plain click turns the card; Ctrl/Cmd + click flips it. */
+  const clickCard = useCallback(
+    (cardId: string, mods: { ctrlKey: boolean; metaKey: boolean }) => {
+      if (mods.ctrlKey || mods.metaKey) toggleFace(cardId);
+      else rotateBy(cardId, -90);
+    },
+    [rotateBy, toggleFace]
+  );
 
   /**
    * A card was released. Inside a zone it joins that zone's order; anywhere else it
@@ -248,7 +256,6 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
             cards={cardsByZone[zone.id] ?? NO_CARDS}
             board={board}
             onRotateBy={rotateBy}
-            onFlip={flipCard}
           />
         ))}
       </div>
@@ -315,7 +322,7 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   const rotation = -(table.seats[viewSeat]?.angle ?? 0);
 
   return (
-    <DragProvider onDrop={handleDrop} onClickCard={rotateCcw} view={view}>
+    <DragProvider onDrop={handleDrop} onClickCard={clickCard} view={view}>
       <PlayArea ref={playArea} rotation={rotation} view={view} overlay={<>{tray}{tableControls}</>}>
         {/* Table surface, purely visual */}
         <div
@@ -353,7 +360,7 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
               /* x/y is the card centre, so pull back by half its own size */
               style={{ transform: `translate(-50%, -50%) translate(${s?.x ?? 0}px, ${s?.y ?? 0}px)` }}
             >
-              <Card card={card} state={s} onRotateBy={rotateBy} onFlip={flipCard} />
+              <Card card={card} state={s} onRotateBy={rotateBy} />
             </div>
           );
         })}

@@ -11,27 +11,16 @@
 :root {
   --ct-card-width: 146px;
   --ct-card-height: 220px;
+  /* Square unless a template asks for a corner radius. */
+  --ct-card-radius: 0px;
 }
 
 .ct-root,
 :root {
   /* Card */
-  --ct-card-padding: 2px;
   --ct-card-margin: 2px;
-  --ct-card-margin-bottom: 6px;
   --ct-card-bg: #f0f0f0;
   --ct-card-border: #000;
-
-  /* Card toolbar */
-  --ct-toolbar-gap: 5px;
-  --ct-toolbar-padding: 5px;
-  --ct-toolbar-top-offset: -34px;
-  --ct-toolbar-button-size: 24px;
-  --ct-toolbar-bg: rgb(223, 223, 223);
-  --ct-toolbar-bg-hover: #f0f0f0;
-  --ct-toolbar-bg-semi: rgba(255, 255, 255, 0.2);
-  --ct-toolbar-bg-hover-semi: rgba(255, 255, 255, 0.5);
-  --ct-toolbar-text-hover: #6396da;
 
   /* Zones */
   --ct-row-zone-width: 640px;
@@ -45,7 +34,6 @@
   --ct-border-standard: 2px;
 
   /* Z-index */
-  --ct-z-toolbar: 999;
   --ct-z-card-container: 100;
   --ct-z-card: 9;
 }

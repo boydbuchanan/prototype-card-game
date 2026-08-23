@@ -92,6 +92,13 @@ const InfoPage: React.FC = () => (
       always wraps.
     </p>
     <p>
+      <b>The template draws the whole card.</b> Nothing is painted underneath it — no border,
+      no background, no rounded corner unless <code>card.radius</code> asks for one. A{" "}
+      <code>bg</code> (and the card <code>frame</code>) is either an image URL or a CSS colour
+      or gradient; an SVG is linked like any other image, so put it in <code>public/</code> and
+      reference it by path.
+    </p>
+    <p>
       <b><code>rotate</code> is where the region is printed</b>, fixed at authoring time — a
       printed card's ink doesn't move when you turn the card. A region reads upright when{" "}
       <code>cardRotation + rotate ≡ 0°</code>, so one card face can carry a different ruleset
@@ -144,9 +151,9 @@ const InfoPage: React.FC = () => (
 
     <h2>Card controls</h2>
     <ul>
-      <li><b>Drag</b> to move a card between zones, or anywhere inside a Free zone.</li>
+      <li><b>Drag</b> to move a card into a zone, or onto the canvas to leave it loose.</li>
       <li><b>Left click</b> rotates counter-clockwise, <b>right click</b> clockwise.</li>
-      <li><b>Toolbar</b>: 👁 flips the card; ▲ ◄ ► ▼ set orientation directly.</li>
+      <li><b>Ctrl/Cmd + click</b> flips the card over.</li>
     </ul>
     <p>
       Rotation, face and position belong to the card's board state rather than to the zone it

@@ -33,10 +33,8 @@ export function seatCapacity(shape: TableShape, players: number): number {
   return 2 * Math.ceil((n - 2) / 2) + 2;
 }
 
-// A seat panel is roughly as wide as its widest zone (a row zone plus padding)
-// and as tall as its rows stacked. These must exceed that, or seats overlap.
 const SEAT_SLOT = 780;   // canvas units allotted to one seat along an edge
-const TABLE_INSET = 560; // distance from table centre to a seat's centre, per axis
+const TABLE_INSET = 560; // distance from the seat row to a seat's centre, per axis
 
 /**
  * Positions along one edge, centred on it. Two seats on a 1000-wide edge sit at

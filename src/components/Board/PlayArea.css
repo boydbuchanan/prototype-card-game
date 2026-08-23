@@ -69,11 +69,6 @@
   left: 50%;
   top: 50%;
 }
-/* The bottom margin exists to space cards inside a zone. Out here it would
-   offset the card from the point it is supposed to be centred on. */
-.free-card .card-container {
-  margin-bottom: 0;
-}
 
 /* The real card stays put and dims; the ghost follows the pointer. */
 .card-dragging {
@@ -92,7 +87,6 @@
   transition: none;
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
 }
-.card-ghost .card-toolbar { display: none; }
 
 /* While a card is being dragged, zones must not clip or scroll it — otherwise
    the card cannot be pulled out of a zone and a scrollbar appears instead. */

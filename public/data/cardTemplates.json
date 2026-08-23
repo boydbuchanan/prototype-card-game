@@ -1,308 +1,71 @@
 {
   "schema": "cardgame.templates/v1",
-  "card": {
-    "width": 146,
-    "height": 220
-  },
+  "card": { "width": 146, "height": 220, "radius": 8 },
+
+  "_layering": [
+    "Regions paint in list order, so the list reads bottom to top.",
+    "Art goes first and full-bleed. The frame is a region too, not the `frame`",
+    "property: `frame` is the face's own background and therefore always the",
+    "bottom-most layer, which cannot cover the art. As a region with a",
+    "transparent centre it sits over the art edges the way printed stock does.",
+    "Title, body and badge come after the frame, so they read on top of it."
+  ],
+
   "styles": {
-    "frame": {
-      "bg": "#2C3440",
-      "color": "#E8ECF2",
-      "size": 8
-    },
-    "title": {
-      "bg": "#1B222C",
-      "color": "#E8ECF2",
-      "weight": 700
-    },
-    "art": {
-      "bg": "#78909C",
-      "color": "#0D1418"
-    },
-    "edge": {
-      "bg": "#E8791A",
-      "color": "#1A0F04",
-      "weight": 600
-    },
-    "alt": {
-      "bg": "#F4A7C8",
-      "color": "#2A0F1A"
-    },
-    "corner": {
-      "bg": "#111418",
-      "color": "#FFFFFF",
-      "weight": 700
-    },
-    "body": {
-      "bg": "#FDF3D0",
-      "color": "#2A2412"
-    },
-    "plain": {
-      "bg": "#F2F4F7",
-      "color": "#14181D"
-    }
+    "art": { "bg": "art/art.svg" },
+    "frame": { "bg": "art/frame.svg" },
+    "titleBar": { "bg": "rgba(43,29,14,0.82)", "color": "#F6ECD2", "weight": 700, "size": 11 },
+    "prose": { "bg": "rgba(253,247,230,0.9)", "color": "#2A2412", "size": 8, "align": "left" },
+    "badge": { "bg": "art/icon.svg", "color": "#FFF3D6", "weight": 700, "size": 13 },
+
+    "edgeAction": { "bg": "rgba(179,69,42,0.88)", "color": "#FFF1E4", "weight": 600, "size": 8 },
+    "edgeItem": { "bg": "rgba(46,110,126,0.88)", "color": "#EAF7FA", "weight": 600, "size": 8 },
+    "edgeUnit": { "bg": "rgba(78,122,58,0.88)", "color": "#EFF8E7", "weight": 600, "size": 8 }
   },
+
   "templates": {
     "default": {
       "regions": [
-        {
-          "rect": [
-            0,
-            0,
-            100,
-            12
-          ],
-          "column": "cardName",
-          "style": "title"
-        },
-        {
-          "rect": [
-            0,
-            12,
-            100,
-            76
-          ],
-          "column": "body",
-          "style": "plain"
-        },
-        {
-          "rect": [
-            0,
-            88,
-            100,
-            12
-          ],
-          "column": "cardType",
-          "style": "frame"
-        }
+        { "rect": [0, 0, 100, 100], "style": "art" },
+        { "rect": [0, 0, 100, 100], "style": "frame" },
+        { "rect": [9, 7, 82, 11], "column": "cardName", "style": "titleBar" },
+        { "rect": [9, 62, 82, 31], "column": "body", "style": "prose" },
+        { "rect": [72, 53, 19, 13], "column": "corner", "style": "badge" }
       ]
     },
+
     "Action": {
       "regions": [
-        {
-          "rect": [
-            12,
-            0,
-            76,
-            8
-          ],
-          "rotate": 180,
-          "column": "title",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            0,
-            0,
-            12,
-            8
-          ],
-          "style": "frame"
-        },
-        {
-          "rect": [
-            88,
-            0,
-            12,
-            8
-          ],
-          "column": "corner",
-          "style": "corner"
-        },
-        {
-          "rect": [
-            13,
-            8,
-            74,
-            62
-          ],
-          "column": "cardName",
-          "style": "art"
-        },
-        {
-          "rect": [
-            0,
-            8,
-            13,
-            62
-          ],
-          "rotate": 90,
-          "column": "left",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            87,
-            8,
-            13,
-            62
-          ],
-          "rotate": 270,
-          "column": "right",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            0,
-            70,
-            100,
-            30
-          ],
-          "column": "body",
-          "style": "body"
-        }
+        { "rect": [0, 0, 100, 100], "style": "art" },
+        { "rect": [0, 0, 100, 100], "style": "frame" },
+        { "rect": [9, 7, 82, 11], "column": "cardName", "style": "titleBar" },
+        { "rect": [9, 20, 8, 40], "rotate": 90, "column": "left", "style": "edgeAction" },
+        { "rect": [83, 20, 8, 40], "rotate": 270, "column": "right", "style": "edgeAction" },
+        { "rect": [9, 62, 82, 31], "column": "body", "style": "prose" },
+        { "rect": [72, 53, 19, 13], "column": "corner", "style": "badge" }
       ]
     },
+
     "Item": {
       "regions": [
-        {
-          "rect": [
-            12,
-            0,
-            76,
-            8
-          ],
-          "rotate": 180,
-          "column": "title",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            0,
-            0,
-            12,
-            8
-          ],
-          "style": "frame"
-        },
-        {
-          "rect": [
-            88,
-            0,
-            12,
-            8
-          ],
-          "column": "corner",
-          "style": "corner"
-        },
-        {
-          "rect": [
-            15,
-            8,
-            70,
-            62
-          ],
-          "column": "cardName",
-          "style": "art"
-        },
-        {
-          "rect": [
-            0,
-            8,
-            15,
-            62
-          ],
-          "rotate": 90,
-          "column": "left",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            85,
-            8,
-            15,
-            62
-          ],
-          "rotate": 270,
-          "column": "right",
-          "style": "alt"
-        },
-        {
-          "rect": [
-            0,
-            70,
-            100,
-            30
-          ],
-          "column": "body",
-          "style": "body"
-        }
+        { "rect": [0, 0, 100, 100], "style": "art" },
+        { "rect": [0, 0, 100, 100], "style": "frame" },
+        { "rect": [9, 7, 82, 11], "column": "cardName", "style": "titleBar" },
+        { "rect": [9, 54, 82, 6], "column": "title", "style": "edgeItem" },
+        { "rect": [9, 62, 82, 31], "column": "body", "style": "prose" },
+        { "rect": [72, 53, 19, 13], "column": "corner", "style": "badge" }
       ]
     },
+
     "Unit": {
       "regions": [
-        {
-          "rect": [
-            12,
-            0,
-            76,
-            8
-          ],
-          "rotate": 180,
-          "column": "title",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            0,
-            0,
-            12,
-            8
-          ],
-          "style": "frame"
-        },
-        {
-          "rect": [
-            88,
-            0,
-            12,
-            8
-          ],
-          "column": "corner",
-          "style": "corner"
-        },
-        {
-          "rect": [
-            13,
-            8,
-            74,
-            58
-          ],
-          "column": "cardName",
-          "style": "art"
-        },
-        {
-          "rect": [
-            0,
-            8,
-            13,
-            58
-          ],
-          "rotate": 90,
-          "column": "left",
-          "style": "edge"
-        },
-        {
-          "rect": [
-            87,
-            8,
-            13,
-            58
-          ],
-          "rotate": 270,
-          "column": "right",
-          "style": "alt"
-        },
-        {
-          "rect": [
-            0,
-            66,
-            100,
-            34
-          ],
-          "column": "body",
-          "style": "body"
-        }
+        { "rect": [0, 0, 100, 100], "style": "art" },
+        { "rect": [0, 0, 100, 100], "style": "frame" },
+        { "rect": [9, 7, 82, 11], "column": "cardName", "style": "titleBar" },
+        { "rect": [9, 20, 8, 40], "rotate": 90, "column": "left", "style": "edgeUnit" },
+        { "rect": [83, 20, 8, 40], "rotate": 270, "column": "right", "style": "edgeUnit" },
+        { "rect": [9, 62, 82, 31], "column": "body", "style": "prose" },
+        { "rect": [72, 53, 19, 13], "column": "corner", "style": "badge" }
       ]
     }
   }

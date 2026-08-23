@@ -51,8 +51,8 @@ function ancestorRotation(el: HTMLElement, view: ViewState): { rot: number; scal
 
 export const DragProvider: React.FC<{
   onDrop: (cardId: string, target: DropTarget) => void;
-  /** A press that never became a drag. Left click rotates counter-clockwise. */
-  onClickCard: (cardId: string) => void;
+  /** A press that never became a drag. The caller decides what the modifiers mean. */
+  onClickCard: (cardId: string, mods: { ctrlKey: boolean; metaKey: boolean }) => void;
   view: React.RefObject<ViewState>;
   children: React.ReactNode;
 }> = ({ onDrop, onClickCard, view, children }) => {
@@ -122,7 +122,6 @@ export const DragProvider: React.FC<{
   };
 
   const beginDrag = useCallback((e: React.PointerEvent, cardId: string) => {
-    if ((e.target as HTMLElement).closest(".toolbar-button")) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
     const el = e.currentTarget as HTMLElement;
@@ -191,8 +190,8 @@ export const DragProvider: React.FC<{
         onDrop(s.cardId, { ...hitTest(cx, cy, s.el), clientX: cx, clientY: cy });
       } else if (e.button === 0 || e.pointerType !== "mouse") {
         // Pointer capture redirects the click to the capturing element, so the
-        // card's own onClick never fires — rotate from here instead.
-        onClickCard(s.cardId);
+        // card's own onClick never fires — report it from here instead.
+        onClickCard(s.cardId, { ctrlKey: e.ctrlKey, metaKey: e.metaKey });
       }
     };
 
