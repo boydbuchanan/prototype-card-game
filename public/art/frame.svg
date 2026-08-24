@@ -1,22 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 146 220" preserveAspectRatio="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" preserveAspectRatio="none">
   <!-- An overlay frame: the centre is transparent so the art beneath shows through,
-       and the border band covers the art's outer edge the way printed stock does. -->
+       and the border band covers the art's outer edge the way printed stock does.
+       Authored at the card's real 2.5x3.5in proportion. -->
   <defs>
     <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#F3E4C0"/>
       <stop offset="1" stop-color="#D8BC86"/>
     </linearGradient>
     <mask id="window">
-      <rect width="146" height="220" fill="#fff"/>
-      <rect x="11" y="11" width="124" height="198" rx="4" fill="#000"/>
+      <rect width="250" height="350" fill="#fff"/>
+      <rect x="19" y="18" width="212" height="314" rx="6" fill="#000"/>
     </mask>
   </defs>
-  <rect width="146" height="220" rx="8" fill="url(#band)" mask="url(#window)"/>
-  <rect x="1.25" y="1.25" width="143.5" height="217.5" rx="7" fill="none" stroke="#6B4B24" stroke-width="2.5"/>
-  <rect x="10" y="10" width="126" height="200" rx="5" fill="none" stroke="#6B4B24" stroke-width="2"/>
-  <rect x="7" y="7" width="132" height="206" rx="4" fill="none" stroke="#A5813F" stroke-width="1"/>
-  <circle cx="8.5" cy="8.5" r="3" fill="#6B4B24"/>
-  <circle cx="137.5" cy="8.5" r="3" fill="#6B4B24"/>
-  <circle cx="8.5" cy="211.5" r="3" fill="#6B4B24"/>
-  <circle cx="137.5" cy="211.5" r="3" fill="#6B4B24"/>
+  <rect width="250" height="350" rx="12" fill="url(#band)" mask="url(#window)"/>
+  <rect x="2" y="2" width="246" height="346" rx="11" fill="none" stroke="#6B4B24" stroke-width="4"/>
+  <rect x="17" y="16" width="216" height="318" rx="8" fill="none" stroke="#6B4B24" stroke-width="3"/>
+  <rect x="12" y="11" width="226" height="328" rx="7" fill="none" stroke="#A5813F" stroke-width="1.5"/>
+  <circle cx="14.5" cy="13.5" r="5" fill="#6B4B24"/>
+  <circle cx="235.5" cy="13.5" r="5" fill="#6B4B24"/>
+  <circle cx="14.5" cy="336.5" r="5" fill="#6B4B24"/>
+  <circle cx="235.5" cy="336.5" r="5" fill="#6B4B24"/>
 </svg>

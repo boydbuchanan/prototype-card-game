@@ -1,100 +1,154 @@
 import { TableShape } from "enums";
+import { TableSize, toPx, RealUnit, DEFAULT_UNIT } from "./units";
+
+export type SeatSide = "bottom" | "left" | "top" | "right";
 
 export interface Seat {
   index: number;
-  /** Canvas coordinates of the seat's centre. */
   x: number;
   y: number;
-  /** Degrees the seat panel is rotated by. 0 = facing the viewer from the bottom edge. */
   angle: number;
-  /** Which edge of the table the seat sits on. */
-  side: "bottom" | "left" | "top" | "right";
-  /** True when no player occupies it — still rendered, so the shape is visible. */
-  empty: boolean;
+  side?: SeatSide;
 }
 
 export interface TableLayout {
   shape: TableShape;
-  /** Table size in canvas units. */
+  /** Table footprint in canvas px. */
   width: number;
   height: number;
   seats: Seat[];
 }
 
-/** How many seats each shape provides for a given player count. */
-export function seatCapacity(shape: TableShape, players: number): number {
-  const n = Math.max(1, players);
-  if (shape === TableShape.Square) {
-    return 4 * Math.ceil(n / 4);
-  }
-  // Rectangle: up to four players sit two per long side and the ends stay closed.
-  // Beyond that the ends open and the long sides grow.
-  if (n <= 4) return 4;
-  return 2 * Math.ceil((n - 2) / 2) + 2;
-}
-
-const SEAT_SLOT = 780;   // canvas units allotted to one seat along an edge
-const TABLE_INSET = 560; // distance from the seat row to a seat's centre, per axis
-
 /**
- * Positions along one edge, centred on it. Two seats on a 1000-wide edge sit at
- * -250 and +250, three at -333/0/+333, and so on.
+ * Positions along one edge, centred on it. One seat sits at 50%, two at 25% and
+ * 75%, three at 1/6, 1/2, 5/6 — the fractions real place settings fall on.
  */
-function spread(count: number, span: number): number[] {
+export function spread(count: number, span: number): number[] {
   if (count <= 0) return [];
   const step = span / count;
   return Array.from({ length: count }, (_, i) => -span / 2 + step * (i + 0.5));
 }
 
+const flip = (v: number) => (v === 0 ? 0 : -v);
+
 /**
- * Seats for a table, in fill order: bottom edge first, then clockwise.
- * Seats beyond `players` are marked empty rather than omitted.
+ * Trig leaves float dust — sin(pi) is 1.2e-16, which reaches the DOM as
+ * `translate(2.1e-13px, ...)`. Round to a hundredth of a pixel, well below
+ * anything visible, so coordinates read cleanly.
+ */
+const tidy = (v: number) => {
+  const r = Math.round(v * 100) / 100;
+  return r === 0 ? 0 : r;
+};
+
+/**
+ * How many seats land on each edge.
+ *
+ * Square: one per edge before any edge doubles up, ordered bottom, top, left,
+ * right — so two players face each other and four get a side each.
+ *
+ * Rectangle: people fill a long table's sides before they take an end. Two per
+ * long side first (so 1–4 sit two and two across from each other), then the two
+ * ends, then the long sides keep growing — 7 and 8 make it three a side.
+ */
+export function distribute(
+  shape: TableShape,
+  players: number,
+  size?: TableSize
+): Record<SeatSide, number> {
+  const n = Math.max(0, players);
+  const counts: Record<SeatSide, number> = { bottom: 0, top: 0, left: 0, right: 0 };
+  const add = (order: SeatSide[]) => order.slice(0, n).forEach((side) => { counts[side]++; });
+
+  if (shape === TableShape.Square) {
+    const cycle: SeatSide[] = ["bottom", "top", "left", "right"];
+    for (let i = 0; i < n; i++) counts[cycle[i % 4]]++;
+    return counts;
+  }
+
+  // Which edges are actually the long ones, so the rule holds whichever way
+  // round the table was authored.
+  const widthIsLong = !size || size.width >= size.height;
+  const long: SeatSide[] = widthIsLong ? ["bottom", "top"] : ["left", "right"];
+  const ends: SeatSide[] = widthIsLong ? ["left", "right"] : ["bottom", "top"];
+
+  const order: SeatSide[] = [long[0], long[1], long[0], long[1], ends[0], ends[1]];
+  for (let i = 0; order.length < n; i++) order.push(long[i % 2]);
+  add(order);
+  return counts;
+}
+
+/**
+ * Seats for a table of a given size. The table's size is authored, never derived
+ * from the seats: a board that does not fit overhangs its neighbour, and seeing
+ * that is the point.
  */
 export function buildTable(
   shape: TableShape = TableShape.Square,
-  players: number = 1
+  players: number = 1,
+  size: TableSize = { width: 60, height: 60 },
+  unit: RealUnit = DEFAULT_UNIT
 ): TableLayout {
-  const capacity = seatCapacity(shape, players);
+  const width = toPx(size.width, unit);
+  const height = toPx(size.height, unit);
   const seats: Seat[] = [];
+  const n = Math.max(0, players);
 
-  const push = (side: Seat["side"], x: number, y: number, angle: number) => {
-    seats.push({ index: seats.length, x, y, angle, side, empty: false });
-  };
-
-  if (shape === TableShape.Square) {
-    const perSide = capacity / 4;
-    const span = Math.max(perSide * SEAT_SLOT, SEAT_SLOT);
-    const reach = span / 2 + TABLE_INSET;
-    const offsets = spread(perSide, span);
-
-    offsets.forEach((o) => push("bottom", o, reach, 0));
-    offsets.forEach((o) => push("left", -reach, -o, 90));
-    offsets.forEach((o) => push("top", -o, -reach, 180));
-    offsets.forEach((o) => push("right", reach, o, 270));
-
-    const seated = markEmpty(seats, players);
-    return { shape, width: span + TABLE_INSET * 2, height: span + TABLE_INSET * 2, seats: seated };
+  if (shape === TableShape.Round) {
+    // Evenly around the circumference, first seat at the bottom facing up.
+    const r = width / 2;
+    for (let i = 0; i < n; i++) {
+      const deg = (360 / n) * i;
+      const rad = (deg * Math.PI) / 180;
+      seats.push({
+        index: i,
+        x: tidy(r * Math.sin(rad)),
+        y: tidy(r * Math.cos(rad)),
+        // A seat at the bottom (deg 0) faces up, i.e. angle 0. Going anticlockwise
+        // round the table turns the seat by the same amount.
+        angle: flip(deg),
+      });
+    }
+    return { shape, width, height, seats };
   }
 
-  // Rectangle
-  const useEnds = capacity > 4;
-  const perLong = (capacity - (useEnds ? 2 : 0)) / 2;
-  const longSpan = Math.max(perLong * SEAT_SLOT, SEAT_SLOT);
-  const shortSpan = SEAT_SLOT;
-  const reachY = shortSpan / 2 + TABLE_INSET;
-  const reachX = longSpan / 2 + TABLE_INSET;
-  const along = spread(perLong, longSpan);
+  const counts = distribute(shape, n, size);
+  // Each edge is spread by its own length — a rectangle's ends are not its sides.
+  const offsets: Record<SeatSide, number[]> = {
+    bottom: spread(counts.bottom, width),
+    top: spread(counts.top, width),
+    left: spread(counts.left, height),
+    right: spread(counts.right, height),
+  };
 
-  along.forEach((o) => push("bottom", o, reachY, 0));
-  if (useEnds) push("left", -reachX, 0, 90);
-  along.forEach((o) => push("top", -o, -reachY, 180));
-  if (useEnds) push("right", reachX, 0, 270);
+  // Interleaved so seat 0 is the first bottom seat, seat 1 the first top seat and
+  // so on: the seat index is the player number, and players should fill the table
+  // evenly rather than crowd one edge.
+  const cursors: Record<SeatSide, number> = { bottom: 0, top: 0, left: 0, right: 0 };
+  const order: SeatSide[] =
+    shape === TableShape.Square
+      ? ["bottom", "top", "left", "right"]
+      : ["left", "right", "bottom", "top"];
 
-  const seated = markEmpty(seats, players);
-  return { shape, width: longSpan + TABLE_INSET * 2, height: shortSpan + TABLE_INSET * 2, seats: seated };
-}
+  const place = (side: SeatSide, o: number): Seat => {
+    switch (side) {
+      case "bottom": return { index: seats.length, x: tidy(o), y: tidy(height / 2), angle: 0, side };
+      case "left":   return { index: seats.length, x: tidy(-width / 2), y: tidy(flip(o)), angle: 90, side };
+      case "top":    return { index: seats.length, x: tidy(flip(o)), y: tidy(-height / 2), angle: 180, side };
+      case "right":  return { index: seats.length, x: tidy(width / 2), y: tidy(o), angle: 270, side };
+    }
+  };
 
-/** Fill seats in order; anything past the player count renders but is marked empty. */
-function markEmpty(seats: Seat[], players: number): Seat[] {
-  return seats.map((s, i) => ({ ...s, index: i, empty: i >= players }));
+  while (seats.length < n) {
+    let placed = false;
+    for (const side of order) {
+      if (cursors[side] >= counts[side]) continue;
+      seats.push(place(side, offsets[side][cursors[side]++]));
+      placed = true;
+      if (seats.length >= n) break;
+    }
+    if (!placed) break; // counts exhausted; guards against a bad distribute()
+  }
+
+  return { shape, width, height, seats };
 }

@@ -84,33 +84,68 @@ View @ [boydbuchanan.github.io/prototype-card-game](https://boydbuchanan.github.
 ```ts
 interface GameSetup {
   Players: number;           // Number of players in the game
-  Cards: CardData[];         // All cards in the game
+  TableShape?: TableShape;   // square | round | rectangle
+  TableSize?: TableSize;     // Optional override. Omit to use the default size chart
+  TableUnit?: RealUnit;      // "cm" (default) or "in"
   SharedZones: RowSetup[];   // Zones shared by all players (e.g., Deck, Discard)
   PlayerZones: RowSetup[];   // Zones each player has (e.g., Hand, In Play)
+  TrayZones?: RowSetup[];    // Screen-fixed zones, off the table entirely
 }
 
 interface RowSetup {
   RowName: string;           // Name of the row (e.g., "Shared", "Player")
   Zones: ZoneSetup[];        // Array of zones in this row
+  OnTable?: boolean;         // False hangs the row off the table edge. Default true
 }
 
 interface ZoneSetup {
   Name: string;              // Name of the zone (e.g., "Deck", "Hand")
   CardDisplay: CardFace;     // How cards are displayed (FaceUp, FaceDown, Both)
-  ZoneType: CardZoneType;    // Type of zone (Stack, Bar, etc.)
-  CardRotation?: Rotation;   // Optional: rotation of cards in this zone
+  ZoneType: CardZoneType;    // Stack, Row or Column
   TextPosition?: Position;   // Optional: where the zone label appears
 }
 ```
+
+### Cards are pixels; the table is real
+
+**A card never scales.** It is authored in pixels and always renders at those pixels, whatever
+unit the table uses — switching the table from inches to centimetres does not touch it.
+
+**The table is a real measurement**, converted at 100px per inch, so a centimetre is 39.37px
+and a 150cm table renders 5906px. Choosing the card's pixel size is therefore what decides how
+big a real table looks next to it: at the shipped 250×350px card, a 150cm table is 23 cards
+across.
+
+**Size comes from a chart of real dining tables** keyed by shape and seat count, so picking a
+shape and a player count is enough — the table steps up as players are added. Past the largest
+charted table it keeps growing the same way: longer but no deeper for a rectangle, wider all
+round for a square, a bigger circle for a round table.
+
+A designer who wants a specific table ticks **Custom size** and enters it, or authors
+`TableSize` in the setup. Either way the size is then theirs and adding a player stops
+resizing the table; clearing the override hands it back to the chart.
+
+Sizes are whole units, in centimetres by default. Inches are the coarser option — a whole inch
+is a bigger step — so `"TableUnit": "in"` trades precision for familiarity. Switching unit restates the same table rather than resizing it, give or take
+the rounding to whole units.
+
+### On the table, or off it
+
+`OnTable` says whether a row takes up table space. A hand is held rather than laid down, so
+`"OnTable": false` hangs that row off the table edge in front of the player, where it occupies
+no surface. On-table rows stack inward onto the table from the same edge. `TrayZones` are off
+the table *and* fixed to the screen, for things like a token supply.
 
 ---
 
 ## How it Works
 
 - **Players:** Sets the number of players. Used to generate player-specific zones.
-- **Cards:** The list of all cards in the game, usually loaded from a CSV file.
+- **TableShape / TableSize:** The table's outline and its real dimensions. Shape decides how
+  seats distribute; size decides the footprint. The table never grows to fit its players.
 - **SharedZones:** Defines rows of zones that are shared by all players (e.g., Deck, Discard).
 - **PlayerZones:** Defines rows of zones that each player gets (e.g., Hand, In Play, Resource).
+  A setup with none gets no seats at all — a solitaire table is just its shared zones.
 
 ---
 
@@ -119,7 +154,8 @@ interface ZoneSetup {
 ```ts
 const gameSetup: GameSetup = {
   Players: 1,
-  Cards: [],
+  TableShape: TableShape.Square,
+  TableSize: { width: 35.4, height: 35.4 },
   SharedZones: [
     {
       RowName: "Shared",
@@ -167,20 +203,29 @@ board state, so a card keeps its orientation when it moves, and **Save Board** r
 
 ## Table Controls
 
-The bar at the bottom of the play area changes how the table is presented, not what is on it:
+The panel at the bottom left changes how the table is presented, not what is on it. Setting the
+table up is rare, so it collapses behind **▸ Table**; **View from** is not, so it stays out:
 
-- **Table** — switch between a square and a rectangle.
+- **Table** — square, round or rectangle.
+- **Custom size** — off by default, showing the chart's size for the current shape and player
+  count. Tick it to pick **in / cm** and enter the table's width × length yourself.
 - **Players** — add or remove seats. Removing a seat leaves its cards exactly where they were
   sitting, as free cards on the canvas; nothing is discarded by reshaping the table mid-game.
 - **View from** — turn the board so a given seat faces you.
 
-Seats past the player count still show, greyed out, so the shape of the table stays readable.
-They have no zones and cannot take a drop.
+The table does not grow to accommodate players. Add enough and their boards overlap — that is
+the point, since it shows a layout does not fit the table you actually own.
+
+Seats fill the way people actually sit down. On a square or round table, one per side before
+any side doubles up. On a rectangle, the long sides take two apiece first — so 1–4 sit two and
+two facing each other — then the two ends, then the long sides keep growing, with 7 and 8
+making it three a side. An end never takes more than one seat.
 
 The initial seat count comes from `players` in the scenario, falling back to `Players` in the
 game setup.
 
-**Moving around:** drag the background to pan, or use the wheel. Ctrl/Cmd + wheel zooms.
+**Moving around:** drag the background to pan, or use the wheel. Ctrl/Cmd + wheel zooms, and
+**Fit** frames the whole table.
 
 ---
 

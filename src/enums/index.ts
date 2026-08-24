@@ -21,6 +21,7 @@ export enum CardZoneType {
 
 export enum TableShape {
   Square = "square",
+  Round = "round",
   Rectangle = "rectangle",
 }
 export enum CardFace {

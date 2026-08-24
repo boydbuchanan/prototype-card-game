@@ -22,9 +22,11 @@
   --ct-card-bg: #f0f0f0;
   --ct-card-border: #000;
 
-  /* Zones */
-  --ct-row-zone-width: 640px;
-  --ct-column-zone-height: 480px;
+  /* How far a player's on-table zones sit in from the table edge — one inch at
+     100px per inch, so they rest on the surface rather than on the rim. */
+  --ct-seat-inset: 100px;
+  --ct-row-zone-width: 1200px;   /* 12in */
+  --ct-column-zone-height: 900px; /* 9in */
 
   /* Layout */
   --ct-gap-small: 5px;

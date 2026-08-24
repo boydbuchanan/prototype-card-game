@@ -1,6 +1,5 @@
 {
   "Players": 4,
-  "Cards": [],
   "TableShape": "square",
   "SharedZones": [
     {
@@ -48,7 +47,8 @@
           "ZoneType": 0,
           "TextPosition": "right"
         }
-      ]
+      ],
+      "OnTable": false
     }
   ],
   "TrayZones": [

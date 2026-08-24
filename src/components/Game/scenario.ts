@@ -42,6 +42,7 @@ export interface ZoneInfo {
 export interface ZoneRow {
   rowName: string;
   zones: ZoneInfo[];
+  onTable: boolean;
 }
 
 function zoneIdFor(scope: ZoneScope, rowName: string, zoneName: string, player?: number) {
@@ -64,6 +65,7 @@ function rowsFor(game: GameSetup, scope: ZoneScope): RowSetup[] {
 export function zoneRows(game: GameSetup, scope: ZoneScope, player?: number): ZoneRow[] {
   return rowsFor(game, scope).map((row) => ({
     rowName: row.RowName,
+    onTable: row.OnTable ?? true,
     zones: row.Zones.map((z) => ({
       id: zoneIdFor(scope, row.RowName, z.Name, player),
       name: z.Name,

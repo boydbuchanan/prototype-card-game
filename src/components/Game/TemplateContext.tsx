@@ -20,13 +20,14 @@ export const TemplateProvider: React.FC<{
    */
   useEffect(() => {
     const root = document.documentElement;
+    const card = templates?.card;
     const apply = (name: string, px?: number) => {
       if (px == null) root.style.removeProperty(name);
       else root.style.setProperty(name, `${px}px`);
     };
-    apply("--ct-card-width", templates?.card?.width);
-    apply("--ct-card-height", templates?.card?.height);
-    apply("--ct-card-radius", templates?.card?.radius);
+    apply("--ct-card-width", card?.width);
+    apply("--ct-card-height", card?.height);
+    apply("--ct-card-radius", card?.radius);
   }, [templates]);
 
   return <TemplateContext.Provider value={templates}>{children}</TemplateContext.Provider>;

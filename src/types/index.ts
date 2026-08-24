@@ -1,5 +1,6 @@
 
 import { CardFace, CardZoneType, Position, TableShape } from "enums";
+import { RealUnit, TableSize } from "components/Game/units";
 
 // Define the CardData type.
 // A card is identity plus arbitrary columns from cards.csv; card templates read
@@ -13,8 +14,12 @@ export interface CardData {
 
 export interface GameSetup {
   Players: number;
-  /** Table shape. Seats are derived from this and Players. */
+  /** Table outline, and with it how seats distribute around the edges. */
   TableShape?: TableShape,
+  /** Table footprint in TableUnit. `width` is the diameter when Round. */
+  TableSize?: TableSize,
+  /** Unit the table is authored in. Inches on CM */
+  TableUnit?: RealUnit,
   /** Centre of the table. */
   SharedZones: RowSetup[],
   /** Authored once, stamped at every seat. */
@@ -24,7 +29,8 @@ export interface GameSetup {
 }
 export interface RowSetup {
   RowName: string,
-  Zones: ZoneSetup[]
+  Zones: ZoneSetup[],
+  OnTable?: boolean,
 }
 export interface ZoneSetup {
   Name: string;
@@ -125,7 +131,6 @@ export interface CardTemplate {
 
 export interface CardTemplates {
   schema?: string;
-  /** The card's size on the table, and the corner radius of its face. */
   card: { width: number; height: number; radius?: number };
   styles?: Record<string, RegionStyle>;
   /** Keyed by cardType. */

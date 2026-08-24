@@ -8,6 +8,9 @@ import { CardFace, CardZoneType, Position, TableShape } from "enums";
 import { DragProvider, DropTarget, ViewState } from "components/Game/drag";
 import { buildTable, Seat } from "components/Game/seats";
 import {
+  convertSize, defaultTableSize, DEFAULT_UNIT, RealUnit, roundSize, TableSize, UNIT_LABEL,
+} from "components/Game/units";
+import {
   buildBoard, listZones, playerCount, reconcileZones, ZoneRow, zoneRows,
 } from "components/Game/scenario";
 
@@ -32,6 +35,7 @@ export const defaultSetup: GameSetup = {
       ]
     }, {
       RowName: "Player",
+      OnTable: false,
       Zones: [
         { Name: "Hand", CardDisplay: CardFace.Both, ZoneType: CardZoneType.Row, TextPosition: Position.Left },
         { Name: "Removed", CardDisplay: CardFace.FaceUp, ZoneType: CardZoneType.Stack, TextPosition: Position.Right },
@@ -49,12 +53,36 @@ export const defaultSetup: GameSetup = {
 const NO_CARDS: CardData[] = [];
 
 const MIN_PLAYERS = 1;
-/** A cap on the control, not on the model: buildTable grows the table for any count. */
-const MAX_PLAYERS = 8;
 
+const SHAPE_LABEL: Record<TableShape, string> = {
+  [TableShape.Square]: "Square",
+  [TableShape.Round]: "Round",
+  [TableShape.Rectangle]: "Rect",
+};
+
+
+/**
+ * Everything the table controls own. `size` follows the default chart from the
+ * shape and player count unless `custom` is set, at which point the designer owns
+ * it and adding a player no longer resizes the table.
+ */
 interface Seating {
   shape: TableShape;
   players: number;
+  size: TableSize;
+  unit: RealUnit;
+  custom: boolean;
+}
+
+function seatingFrom(game: GameSetup, players: number): Seating {
+  const shape = game.TableShape || TableShape.Square;
+  const unit = game.TableUnit ?? DEFAULT_UNIT;
+  // An authored TableSize is itself an override.
+  const custom = !!game.TableSize;
+  return {
+    shape, players, unit, custom,
+    size: custom ? roundSize(game.TableSize!) : defaultTableSize(shape, players, unit),
+  };
 }
 
 interface PageProps {
@@ -68,19 +96,29 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   const game = useMemo(() => gameSetup || defaultSetup, [gameSetup]);
 
   /** Table shape and seat count. Seeded from the data, then owned by the controls. */
-  const [seating, setSeating] = useState<Seating>(() => ({
-    shape: game.TableShape || TableShape.Square,
-    players: playerCount(game, scenario),
-  }));
+  const [seating, setSeating] = useState<Seating>(
+    () => seatingFrom(game, playerCount(game, scenario))
+  );
   // Mirrors `seating` for the handler below, which must see its own previous
   // change: two quick clicks on + land in one React batch, and reading state
   // there would make the second click repeat the first.
   const seatingRef = useRef(seating);
 
-  const table = useMemo(() => buildTable(seating.shape, seating.players), [seating]);
+  /**
+   * A player with no zones of their own needs no seat — there is nothing to lay
+   * out in front of them. A solitaire table is the shared zones and nothing else,
+   * so the seats, the seat labels and the view-from control all fall away.
+   */
+  const hasPlayerAreas = useMemo(() => zoneRows(game, "player", 1).length > 0, [game]);
+  const table = useMemo(
+    () => buildTable(seating.shape, hasPlayerAreas ? seating.players : 0, seating.size, seating.unit),
+    [seating, hasPlayerAreas]
+  );
 
   /** Which seat is brought to the bottom of the screen. A view control, not game state. */
   const [viewSeat, setViewSeat] = useState(0);
+  /** Table setup is collapsed by default; only the view control stays out. */
+  const [setupOpen, setSetupOpen] = useState(false);
   const playArea = useRef<PlayAreaHandle>(null);
   // Live zoom/rotation, written by PlayArea and read by the drag layer so a
   // dragged card tracks the cursor on a rotated canvas.
@@ -100,7 +138,7 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   // from the same seat count.
   useEffect(() => {
     const players = playerCount(game, scenario);
-    seatingRef.current = { shape: game.TableShape || TableShape.Square, players };
+    seatingRef.current = seatingFrom(game, players);
     setSeating(seatingRef.current);
     setViewSeat(0);
 
@@ -122,15 +160,25 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
   // ids the board is keyed by can never drift from the ids that get rendered.
   const sharedRows = useMemo(() => zoneRows(game, "shared"), [game]);
   const trayRows = useMemo(() => zoneRows(game, "tray"), [game]);
-  // An empty seat is a place at the table, not a player: it gets no zones, so
-  // nothing can be dropped into a seat that nobody is sitting in.
+  /**
+   * Each seat's rows, split by whether they occupy table space. On-table rows
+   * stack inward from the table edge; off-table rows hang outward in front of
+   * the player, taking no room on the surface.
+   */
   const seatRows = useMemo(
-    () => table.seats.map((s) => (s.empty ? null : zoneRows(game, "player", s.index + 1))),
+    () => table.seats.map((s) => {
+      const rows = zoneRows(game, "player", s.index + 1);
+      return {
+        onTable: rows.filter((r) => r.onTable),
+        offTable: rows.filter((r) => !r.onTable),
+      };
+    }),
     [game, table]
   );
+  // The seat is a point on the perimeter; the two stacks anchor to it from either side.
   const seatStyles = useMemo(
     () => table.seats.map((s) => ({
-      transform: `translate(-50%, -50%) translate(${s.x}px, ${s.y}px) rotate(${s.angle}deg)`,
+      transform: `translate(${s.x}px, ${s.y}px) rotate(${s.angle}deg)`,
     })),
     [table]
   );
@@ -222,11 +270,31 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
    * them onto the canvas, at exactly the spot they were sitting — measured here,
    * before any of the state changes, while the old layout is still on screen.
    */
-  const changeSeating = useCallback((change: { shape?: TableShape; delta?: number }) => {
+  const changeSeating = useCallback((change: {
+    shape?: TableShape; delta?: number; size?: Partial<TableSize>;
+    unit?: RealUnit; custom?: boolean;
+  }) => {
     const cur = seatingRef.current;
     const shape = change.shape ?? cur.shape;
-    const players = Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, cur.players + (change.delta ?? 0)));
-    if (shape === cur.shape && players === cur.players) return;
+    const unit = change.unit ?? cur.unit;
+    const custom = change.custom ?? cur.custom;
+    // No upper bound: the table no longer grows to accommodate players beyond the
+    // chart, so a crowded table is a real answer rather than something to prevent.
+    const players = Math.max(MIN_PLAYERS, cur.players + (change.delta ?? 0));
+
+    const size: TableSize =
+      // Typing a size implies the override, and keeps what was typed.
+      change.size ? roundSize({ ...cur.size, ...change.size })
+      // Switching unit restates the same table; the physical size never changes.
+      : change.unit ? convertSize(cur.size, cur.unit, change.unit)
+      // Turning the override off hands the size back to the chart.
+      : custom ? cur.size
+      : defaultTableSize(shape, players, unit);
+
+    const same = shape === cur.shape && players === cur.players && unit === cur.unit
+      && custom === cur.custom
+      && size.width === cur.size.width && size.height === cur.size.height;
+    if (same) return;
 
     const next = reconcileZones(board, order, listZones(game, players), (cardId, zoneId) => {
       // A buried stack card has no element of its own; fall back to its zone.
@@ -240,10 +308,10 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
 
     setBoard(next.state);
     setOrder(next.order);
-    seatingRef.current = { shape, players };
+    seatingRef.current = { shape, players, size, unit, custom };
     setSeating(seatingRef.current);
-    const seats = buildTable(shape, players).seats.length;
-    setViewSeat((v) => Math.min(v, seats - 1));
+    const seats = buildTable(shape, players, size, unit).seats.length;
+    setViewSeat((v) => Math.max(0, Math.min(v, seats - 1)));
   }, [game, board, order]);
 
   const renderRows = (rows: ZoneRow[], cls: string, keyPrefix = "") =>
@@ -265,18 +333,41 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
     <div className="tray">{renderRows(trayRows, "tray-row")}</div>
   ) : null;
 
-  const tableControls = (
-    <div className="table-controls">
+  const isRound = seating.shape === TableShape.Round;
+
+  const sizeInput = (axis: "width" | "height", label: string) => (
+    <input
+      className="control-number"
+      type="number"
+      min={1}
+      step={1}
+      aria-label={label}
+      value={seating.size[axis]}
+      onChange={(e) => {
+        const v = Math.round(Number(e.target.value));
+        if (!Number.isFinite(v) || v < 1) return;
+        // A round table is one measurement: its diameter drives both axes.
+        changeSeating({ size: isRound ? { width: v, height: v } : { [axis]: v } });
+      }}
+    />
+  );
+
+  /**
+   * Setting up the table is a rare act; changing whose seat you are looking from
+   * is not. So the setup collapses and the view stays out.
+   */
+  const tableSetup = (
+    <div className="control-panel">
       <div className="control-group">
         <span className="control-label">Table</span>
-        {[TableShape.Square, TableShape.Rectangle].map((shape) => (
+        {[TableShape.Square, TableShape.Round, TableShape.Rectangle].map((shape) => (
           <button
             key={shape}
             className="control-button"
             aria-pressed={seating.shape === shape}
             onClick={() => changeSeating({ shape })}
           >
-            {shape === TableShape.Square ? "Square" : "Rect"}
+            {SHAPE_LABEL[shape]}
           </button>
         ))}
       </div>
@@ -292,41 +383,103 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
           −
         </button>
         <span className="control-value">{seating.players}</span>
-        <button
-          className="control-button"
-          aria-label="Add a player"
-          disabled={seating.players >= MAX_PLAYERS}
-          onClick={() => changeSeating({ delta: +1 })}
-        >
+        <button className="control-button" aria-label="Add a player" onClick={() => changeSeating({ delta: +1 })}>
           +
         </button>
       </div>
 
       <div className="control-group">
-        <span className="control-label">View from</span>
-        {table.seats.map((s: Seat) => (
-          <button
-            key={s.index}
-            className="control-button"
-            aria-pressed={s.index === viewSeat}
-            onClick={() => setViewSeat(s.index)}
-            title={s.empty ? `Seat ${s.index + 1} (empty)` : `Player ${s.index + 1}`}
-          >
-            {s.empty ? "·" : s.index + 1}
-          </button>
-        ))}
+        <label className="control-check">
+          <input
+            type="checkbox"
+            checked={seating.custom}
+            onChange={(e) => changeSeating({ custom: e.target.checked })}
+          />
+          Custom size
+        </label>
+        {seating.custom ? (
+          <>
+            {(["in", "cm"] as RealUnit[]).map((u) => (
+              <button
+                key={u}
+                className="control-button"
+                aria-pressed={seating.unit === u}
+                title={`Author the table in ${u === "in" ? "inches" : "centimetres"}`}
+                onClick={() => changeSeating({ unit: u })}
+              >
+                {UNIT_LABEL[u]}
+              </button>
+            ))}
+            {sizeInput("width", isRound ? `Diameter in ${seating.unit}` : `Table width in ${seating.unit}`)}
+            {!isRound && (
+              <>
+                <span className="control-times">×</span>
+                {sizeInput("height", `Table length in ${seating.unit}`)}
+              </>
+            )}
+          </>
+        ) : (
+          <span className="control-note">
+            {isRound
+              ? `⌀${seating.size.width} ${seating.unit}`
+              : `${seating.size.width} × ${seating.size.height} ${seating.unit}`}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
+  const tableControls = (
+    <div className="table-controls">
+      {setupOpen && tableSetup}
+      <div className="control-bar">
+        <button
+          className="control-button control-disclosure"
+          aria-expanded={setupOpen}
+          onClick={() => setSetupOpen((v) => !v)}
+        >
+          {setupOpen ? "▾" : "▸"} Table
+        </button>
+        {table.seats.length > 0 && (
+          <div className="control-group">
+            <span className="control-label">View from</span>
+            {table.seats.map((s: Seat) => (
+              <button
+                key={s.index}
+                className="control-button"
+                aria-pressed={s.index === viewSeat}
+                onClick={() => setViewSeat(s.index)}
+                title={`Player ${s.index + 1}`}
+              >
+                {s.index + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 
   const rotation = -(table.seats[viewSeat]?.angle ?? 0);
+  // Stable identity, so PlayArea only re-fits when the table really changes size.
+  const tableFootprint = useMemo(
+    () => ({ width: table.width, height: table.height }),
+    [table.width, table.height]
+  );
 
   return (
     <DragProvider onDrop={handleDrop} onClickCard={clickCard} view={view}>
-      <PlayArea ref={playArea} rotation={rotation} view={view} overlay={<>{tray}{tableControls}</>}>
+      <PlayArea
+        ref={playArea}
+        rotation={rotation}
+        view={view}
+        content={tableFootprint}
+        overlay={<>{tray}{tableControls}</>}
+      >
         {/* Table surface, purely visual */}
         <div
           className={`table-surface table-${table.shape}`}
+          data-shape={table.shape}
           style={{ width: table.width, height: table.height }}
         />
 
@@ -335,18 +488,22 @@ export function Page({ cardData, gameSetup, scenario, onBoardChange }: PageProps
           {renderRows(sharedRows, "shared-zone-row")}
         </div>
 
-        {/* One seat panel per seat, the same authored zones stamped at each */}
         {table.seats.map((seat) => (
           <div
             key={seat.index}
-            className={`seat ${seat.empty ? "seat-empty" : ""}`}
+            className="seat"
             data-seat={seat.index}
             /* The drag layer reads this to orient the ghost. */
             data-angle={seat.angle}
             style={seatStyles[seat.index]}
           >
-            <div className="seat-label">{seat.empty ? `Seat ${seat.index + 1}` : `Player ${seat.index + 1}`}</div>
-            {seatRows[seat.index] && renderRows(seatRows[seat.index]!, "player-zone-row", `${seat.index}-`)}
+            <div className="seat-on-table">
+              {renderRows(seatRows[seat.index].onTable, "player-zone-row", `${seat.index}-on-`)}
+            </div>
+            <div className="seat-off-table">
+              {renderRows(seatRows[seat.index].offTable, "player-zone-row", `${seat.index}-off-`)}
+              <div className="seat-label">Player {seat.index + 1}</div>
+            </div>
           </div>
         ))}
 

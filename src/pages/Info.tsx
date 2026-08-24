@@ -30,6 +30,7 @@ const InfoPage: React.FC = () => (
     <h2>gameSetup.json</h2>
     <pre className="info-pre">{`{
   "Players": 2,
+  "TableShape": "rectangle",
   "SharedZones": [
     { "RowName": "Shared", "Zones": [
       { "Name": "Play", "CardDisplay": "both",     "ZoneType": 1, "TextPosition": "top" },
@@ -37,11 +38,30 @@ const InfoPage: React.FC = () => (
     ]}
   ],
   "PlayerZones": [
-    { "RowName": "Player", "Zones": [
+    { "RowName": "Player", "OnTable": false, "Zones": [
       { "Name": "Hand", "CardDisplay": "both", "ZoneType": 1, "TextPosition": "left" }
     ]}
   ]
 }`}</pre>
+    <p>
+      <b>The table's size comes from a chart of real dining tables</b>, keyed by shape and seat
+      count — pick a shape and a player count and it steps up as players are added. Add{" "}
+      <code>TableSize</code> (whole units, centimetres by default, at 100px per inch) only to
+      override it; the control bar's <b>Custom size</b> tick does the same thing live. <b>A card never scales:</b> it is authored
+      in pixels and always renders at those pixels, so choosing the card's size is what decides
+      how large a real table looks beside it. <code>TableShape</code> is <code>square</code>,{" "}
+      <code>round</code> or <code>rectangle</code>; it decides how seats distribute, while the
+      size decides the footprint. Set <code>"TableUnit": "in"</code> to author in inches, which
+      is the coarser of the two.
+    </p>
+    <p>
+      <b><code>OnTable</code> says whether a row takes up table space.</b> A hand is held, not
+      laid down, so <code>"OnTable": false</code> hangs that row off the table edge in front of
+      the player where it occupies no surface — its top edge sits exactly on the table's edge.
+      On-table rows stack inward from that same edge, held an inch clear of it so they rest on
+      the surface rather than the rim, which matters most on a round table. A row is on
+      the table unless it says otherwise.
+    </p>
     <p>
       <b>ZoneType is a number:</b> <code>0</code> Stack (shows the top card only),{" "}
       <code>1</code> Row (ordered left to right), <code>2</code> Column (ordered top to
@@ -135,14 +155,24 @@ const InfoPage: React.FC = () => (
     <h2>Table controls</h2>
     <p>
       The bar at the bottom of the play area changes how the table is presented, not what is on
-      it. <b>Table</b> switches between a square and a rectangle, <b>Players</b> adds and removes
-      seats, and <b>View from</b> turns the board so a given seat faces you.
+      it. Setting the table up happens rarely, so <b>Table</b>, <b>Players</b> and{" "}
+      <b>Custom size</b> collapse behind <b>▸ Table</b> at the bottom left; changing whose seat
+      you look from happens often, so <b>View from</b> always stays out. Ticking{" "}
+      <b>Custom size</b> reveals the unit and the table's dimensions; switching unit restates
+      the same table rather than resizing it.
+    </p>
+    <p>
+      Once you set a size yourself the table stops growing with the player count. Add enough of
+      them and their boards will overlap, and that is the point: it is how you see that a layout
+      does not fit the table you actually own. Seats fill the way people sit down — one per side
+      before any side doubles up on a square or round table; on a rectangle the long sides take
+      two apiece first, then the ends, then the long sides keep growing.
     </p>
     <p>
       Removing a seat does not discard its cards: each one stays exactly where it was sitting and
-      becomes a free card on the canvas, so nothing is lost by reshaping the table mid-game. Seats
-      past the player count still appear, greyed out, so the shape of the table stays readable —
-      but they have no zones and cannot take a drop.
+      becomes a free card on the canvas, so nothing is lost by reshaping the table mid-game. A
+      setup with no <code>PlayerZones</code> at all gets no seats — a solitaire table is just its
+      shared zones.
     </p>
     <p>
       <b>Moving around:</b> drag the background to pan, or use the wheel. Ctrl/Cmd + wheel zooms,
