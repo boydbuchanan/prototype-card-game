@@ -1,0 +1,316 @@
+{
+  "schema": "cardgame.templates/v1",
+  "card": {
+    "width": 250,
+    "height": 350,
+    "radius": 12
+  },
+  "styles": {
+    "art": {
+      "bg": "art/art.svg"
+    },
+    "frame": {
+      "bg": "art/frame.svg"
+    },
+    "titleBar": {
+      "bg": "rgba(43,29,14,0.82)",
+      "color": "#F6ECD2",
+      "weight": 700,
+      "size": 19
+    },
+    "prose": {
+      "bg": "rgba(253,247,230,0.9)",
+      "color": "#2A2412",
+      "size": 14,
+      "align": "left"
+    },
+    "badge": {
+      "bg": "art/icon.svg",
+      "color": "#FFF3D6",
+      "weight": 700,
+      "size": 22
+    },
+    "edgeAction": {
+      "bg": "rgba(179,69,42,0.88)",
+      "color": "#FFF1E4",
+      "weight": 600,
+      "size": 14
+    },
+    "edgeItem": {
+      "bg": "rgba(46,110,126,0.88)",
+      "color": "#EAF7FA",
+      "weight": 600,
+      "size": 14
+    },
+    "edgeUnit": {
+      "bg": "rgba(78,122,58,0.88)",
+      "color": "#EFF8E7",
+      "weight": 600,
+      "size": 14
+    }
+  },
+  "templates": {
+    "default": {
+      "regions": [
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "art"
+        },
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "frame"
+        },
+        {
+          "rect": [
+            9,
+            7,
+            82,
+            11
+          ],
+          "column": "cardName",
+          "style": "titleBar"
+        },
+        {
+          "rect": [
+            9,
+            62,
+            82,
+            31
+          ],
+          "column": "body",
+          "style": "prose"
+        },
+        {
+          "rect": [
+            72,
+            53,
+            19,
+            13
+          ],
+          "column": "corner",
+          "style": "badge"
+        }
+      ]
+    },
+    "Action": {
+      "regions": [
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "art"
+        },
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "frame"
+        },
+        {
+          "rect": [
+            9,
+            7,
+            82,
+            11
+          ],
+          "column": "cardName",
+          "style": "titleBar"
+        },
+        {
+          "rect": [
+            9,
+            20,
+            8,
+            40
+          ],
+          "rotate": 90,
+          "column": "left",
+          "style": "edgeAction"
+        },
+        {
+          "rect": [
+            83,
+            20,
+            8,
+            40
+          ],
+          "rotate": 270,
+          "column": "right",
+          "style": "edgeAction"
+        },
+        {
+          "rect": [
+            9,
+            62,
+            82,
+            31
+          ],
+          "column": "body",
+          "style": "prose"
+        },
+        {
+          "rect": [
+            72,
+            53,
+            19,
+            13
+          ],
+          "column": "corner",
+          "style": "badge"
+        }
+      ]
+    },
+    "Item": {
+      "regions": [
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "art"
+        },
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "frame"
+        },
+        {
+          "rect": [
+            9,
+            7,
+            82,
+            11
+          ],
+          "column": "cardName",
+          "style": "titleBar"
+        },
+        {
+          "rect": [
+            9,
+            54,
+            82,
+            6
+          ],
+          "column": "title",
+          "style": "edgeItem"
+        },
+        {
+          "rect": [
+            9,
+            62,
+            82,
+            31
+          ],
+          "column": "body",
+          "style": "prose"
+        },
+        {
+          "rect": [
+            72,
+            53,
+            19,
+            13
+          ],
+          "column": "corner",
+          "style": "badge"
+        }
+      ]
+    },
+    "Unit": {
+      "regions": [
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "art"
+        },
+        {
+          "rect": [
+            0,
+            0,
+            100,
+            100
+          ],
+          "style": "frame"
+        },
+        {
+          "rect": [
+            9,
+            7,
+            82,
+            11
+          ],
+          "column": "cardName",
+          "style": "titleBar"
+        },
+        {
+          "rect": [
+            9,
+            20,
+            8,
+            40
+          ],
+          "rotate": 90,
+          "column": "left",
+          "style": "edgeUnit"
+        },
+        {
+          "rect": [
+            83,
+            20,
+            8,
+            40
+          ],
+          "rotate": 270,
+          "column": "right",
+          "style": "edgeUnit"
+        },
+        {
+          "rect": [
+            9,
+            62,
+            82,
+            31
+          ],
+          "column": "body",
+          "style": "prose"
+        },
+        {
+          "rect": [
+            72,
+            53,
+            19,
+            13
+          ],
+          "column": "corner",
+          "style": "badge"
+        }
+      ]
+    }
+  }
+}

@@ -1,17 +1,14 @@
-id,cardName,cardType,cardText,startZone,playerId,cardColor,canDrag,clickRotate
-1,1,Item,+1 NRG,Shared-Deck,0,#C5283D,1,1
-2,2,Item,+1 NRG,Shared-Deck,0,#C5283D,1,1
-3,3,Item,+1 NRG,Shared-Deck,0,#C5283D,1,1
-4,4,Item,+1 NRG,Shared-Deck,0,#C5283D,1,1
-5,5,Weapon,BLK,Shared-Deck,0,#002A32,1,1
-6,6,Weapon,ATK,Shared-Deck,0,#002A32,1,1
-7,7,Skill,SKL,Shared-Deck,0,#7C3626,1,1
-8,8,Skill,SKL,Shared-Deck,0,#7C3626,1,1
-9,9,Ability,+2 MNA,Shared-Deck,0,#E9724C,1,1
-10,10,Ability,+2 MNA,Shared-Deck,0,#E9724C,1,1
-11,11,Ability,+2 MNA,Shared-Deck,0,#E9724C,1,1
-12,12,Ability,+2 MNA,Shared-Deck,0,#E9724C,1,1
-13,13,Base,+1 Luck,Hand,1,#333333,1,1
-14,14,Base,+1 Luck,Hand,1,#333333,1,1
-15,15,Base,+1 Luck,Hand,1,#333333,1,1
-16,16,Base,+1 Luck,Hand,1,#333333,1,1
+id,cardName,cardType,title,left,right,corner,body
+1,Card 1,Action,Action,Left,Right,1,"Sample text for card 1. Replace this with your own cards.csv."
+2,Card 2,Item,Item,Left,Right,2,"Sample text for card 2. Replace this with your own cards.csv."
+3,Card 3,Unit,Unit,Left,Right,3,"Sample text for card 3. Replace this with your own cards.csv."
+4,Card 4,Action,Action,Left,Right,4,"Sample text for card 4. Replace this with your own cards.csv."
+5,Card 5,Item,Item,Left,Right,5,"Sample text for card 5. Replace this with your own cards.csv."
+6,Card 6,Unit,Unit,Left,Right,6,"Sample text for card 6. Replace this with your own cards.csv."
+7,Card 7,Action,Action,Left,Right,7,"Sample text for card 7. Replace this with your own cards.csv."
+8,Card 8,Item,Item,Left,Right,8,"Sample text for card 8. Replace this with your own cards.csv."
+9,Card 9,Unit,Unit,Left,Right,9,"Sample text for card 9. Replace this with your own cards.csv."
+10,Card 10,Action,Action,Left,Right,10,"Sample text for card 10. Replace this with your own cards.csv."
+11,Card 11,Item,Item,Left,Right,11,"Sample text for card 11. Replace this with your own cards.csv."
+12,Card 12,Unit,Unit,Left,Right,12,"Sample text for card 12. Replace this with your own cards.csv."
+13,Plain,Other,Plain,,,,"A card type with no template falls back to the default template."

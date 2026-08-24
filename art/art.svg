@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" preserveAspectRatio="none">
+  <!-- Authored at the card's own aspect ratio: region backgrounds are drawn with
+       background-size: contain, so art that matches the rect fills it exactly. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33507F"/>
+      <stop offset="0.45" stop-color="#7FA6C8"/>
+      <stop offset="1" stop-color="#D3E1E8"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5C7A6A"/>
+      <stop offset="1" stop-color="#37533F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="250" height="350" fill="url(#sky)"/>
+
+  <circle cx="185" cy="67" r="22" fill="#F6D77A"/>
+  <circle cx="185" cy="67" r="36" fill="#F6D77A" opacity="0.22"/>
+
+  <path d="M0 210 L51 118 L106 210 Z" fill="url(#ridge)"/>
+  <path d="M164 210 L212 130 L250 210 Z" fill="url(#ridge)"/>
+  <path d="M48 223 L127 89 L209 223 Z" fill="#2E4636"/>
+  <path d="M127 89 L158 134 L127 146 L99 134 Z" fill="#EAF2F5" opacity="0.92"/>
+
+  <rect y="210" width="250" height="140" fill="#22321E"/>
+  <path d="M0 210 Q62 197 127 210 T250 210 L250 226 L0 226 Z" fill="#2C4227"/>
+  <path d="M0 267 Q68 254 127 267 T250 264 L250 350 L0 350 Z" fill="#1B2718"/>
+</svg>
